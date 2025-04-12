@@ -19,7 +19,8 @@
   "packageManager": "pnpm@10.7.1",
   "type": "module",
   "dependencies": {
-    "@trace-dev/types": "workspace:^"
+    "@trace-dev/types": "workspace:^",
+    "ua-parser-js": "^2.0.3"
   },
   "repository": {
     "type": "git",

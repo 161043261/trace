@@ -1,10 +1,9 @@
-import packageJson from '../package.json'
+import packageJson from '../../../package.json'
 
 export const SDK_NAME = 'trace'
 
 export const SDK_VERSION = packageJson.version
 
-// 接口状态
 export enum InterfaceStatus {
   Ok = 'Ok',
   DeadlineError = 'DeadlineError',
@@ -25,14 +24,13 @@ export enum InterfaceStatus {
   DataLoss = 'DataLoss'
 }
 
-// 用户行为
 export enum BreadcrumbType {
-  Http = 'Http', // 接口调用
-  Click = 'Click', // 用户点击事件
-  ResourceError = 'ResourceError', // 资源加载
-  CodeError = 'CodeError', // 代码报错
-  Route = 'Route', // 页面跳转 (路由改变)
-  Custom = 'Custom' // 其他未定义行为
+  Http = 'Http',
+  Click = 'Click',
+  ResourceError = 'ResourceError',
+  SourceCodeError = 'SourceCodeError',
+  Route = 'Route',
+  Custom = 'Custom'
 }
 
 export enum StatusCode {
@@ -57,10 +55,9 @@ export enum EventType {
   WhiteScreen = 'WhiteScreen'
 }
 
-// 接口错误
 export enum HttpType {
-  Xhr = 'Xhr', // XMLHttpRequest 请求
-  Fetch = 'Fetch' // fetch 请求
+  Xhr = 'Xhr', // XMLHttpRequest
+  Fetch = 'Fetch' // fetch
 }
 
 export enum HttpCode {

@@ -34,11 +34,7 @@ export function isEmptyObject(obj: any): boolean {
 }
 
 export function isEmpty(str: any): boolean {
-  return (
-    (verifyType.isString(str) && str.trim() === '') ||
-    str === undefined ||
-    str === null
-  )
+  return (verifyType.isString(str) && str.trim() === '') || str === undefined || str === null
 }
 
 export function isPropertyExist(obj: any, propKey: any): boolean {

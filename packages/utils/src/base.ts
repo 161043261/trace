@@ -1,20 +1,15 @@
 // pnpm add @trace-dev/types --filter @trace-dev/utils
-import { IAnyObject, IAnyCallback } from '@trace-dev/types' // monorepo
+import { IAnyObject, IAnyFn } from '@trace-dev/types' // monorepo
 import { verifyType } from './verify_type'
 
-export function on(
-  target: any,
-  eventName: string,
-  callback: IAnyCallback,
-  options = false
-) {
+export function on(target: any, eventName: string, callback: IAnyFn, options = false) {
   target.addEventListener(eventName, callback, options)
 }
 
 export function replaceAop(
   sourceObj: IAnyObject,
   propKey: string,
-  wrapper: IAnyCallback,
+  wrapper: IAnyFn,
   force = false
 ) {
   if (!sourceObj) return
@@ -27,7 +22,7 @@ export function replaceAop(
   }
 }
 
-export const throttle = (fn: IAnyCallback, delay: number) => {
+export const throttle = (fn: IAnyFn, delay: number) => {
   let canCall = true
   return function (ctx: any, ...args: any[]) {
     if (!canCall) {
@@ -65,16 +60,10 @@ export function typeofAny(target: any): string {
   return Object.prototype.toString.call(target).slice(8, -1)
 }
 
-export function validateType(
-  target: any,
-  targetName: string,
-  expectType: string
-): boolean {
+export function validateType(target: any, targetName: string, expectType: string): boolean {
   if (!target) return false
   if (typeofAny(target) === expectType) return true
-  console.error(
-    `[trace-dev] ${targetName}: Expect ${expectType}, actually ${typeofAny(target)}`
-  )
+  console.error(`[trace-dev] ${targetName}: Expect ${expectType}, actually ${typeofAny(target)}`)
   return false
 }
 
@@ -104,9 +93,7 @@ export function sliceStr(str: string, sliceLength: number) {
   if (verifyType.isString(str)) {
     return (
       str.slice(0, sliceLength) +
-      (str.length > sliceLength
-        ? `: Slice the first ${sliceLength} characters`
-        : '')
+      (str.length > sliceLength ? `: Slice the first ${sliceLength} characters` : '')
     )
   }
   return ''
