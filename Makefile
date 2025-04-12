@@ -12,4 +12,3 @@ degit:
 	git add -A
 	git commit -m "feat: Introduce new feature"
 	git push -f origin main --set-upstream
-

@@ -1,1 +1,1 @@
-export function types() { console.log('types') }
+export * from './base'
