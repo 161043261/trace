@@ -1,7 +1,7 @@
 .PHONY: push degit push2 degit2
 
 push:
-	git add -A
+	pnpm format && git add -A
 	git commit -m "chore: Regular code maintenance"
 	git push origin main
 

@@ -8,7 +8,7 @@ export interface IAnyObject {
   [key: string]: any
 }
 
-export type VoidFn = (...args: any[]) => void;
+export type VoidFn = (...args: any[]) => void
 
 // todo: Without 在表达什么
 export type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never }
@@ -81,7 +81,7 @@ export interface IRouteHistory {
 }
 
 // 用户行为
-export interface IBehavior {
+export interface IBehaviorData {
   eventType: EventType // 事件类型
   behaviorType: BreadcrumbType // 用户行为类型
   statusCode: StatusCode
@@ -92,17 +92,24 @@ export interface IBehavior {
 
 // todo 屏幕录制信息
 export interface IScreenRecord {
-  key: string;
-  events: string;
+  key: string
+  events: string
 }
 
 export interface IBreadcrumbData {
-  eventType: EventType,
-  behaviorType: BreadcrumbType,
+  eventType: EventType
+  behaviorType: BreadcrumbType
   statusCode: StatusCode
 }
 
-export interface IReportData extends IHttpData, IResourceError, ILongTask, IPerformanceData, IMemoryData, ISourceCodeError, IScreenRecord {
+export interface IReportData
+  extends IHttpData,
+    IResourceError,
+    ILongTask,
+    IPerformanceData,
+    IMemoryData,
+    ISourceCodeError,
+    IScreenRecord {
   type: string // 事件类型
   pageUrl: string // 页面地址
   timestamp: number // 发生的时间戳
@@ -110,10 +117,10 @@ export interface IReportData extends IHttpData, IResourceError, ILongTask, IPerf
   apiKey: string // 前端项目的 ID
   status: string // 事件状态
   sdkVersion: string // SDK 的版本号
-  breadcrumb: IBreadcrumbData[];
+  breadcrumb: IBreadcrumbData[]
   // 设备信息
   deviceInfo: {
-    browserVersion: string | number; // 浏览器的版本号
+    browserVersion: string | number // 浏览器的版本号
     browser: string // 例如 chrome
     osVersion: string | number // 操作系统的版本号
     os: string // 操作系统
@@ -124,38 +131,38 @@ export interface IReportData extends IHttpData, IResourceError, ILongTask, IPerf
 }
 
 export interface ISubscribeHandler {
-  type: EventType,
-  callback: IAnyFn;
+  type: EventType
+  callback: IAnyFn
 }
 
 export interface IResourceData {
-  src?: string,
-  href?: string,
-  localName?: string,
+  src?: string
+  href?: string
+  localName?: string
 }
 
 // 身份验证信息
 export interface IAuthInfo {
-  apiKey: string,
-  sdkVersion: string,
+  apiKey: string
+  sdkVersion: string
   userId?: string
 }
 
 export interface IErrorData {
-  localName?: string,
-  error?: any,
-  message: string,
+  localName?: string
+  error?: any
+  message: string
 }
 
 export interface ITraceDev {
   hasError: boolean // 某个时间段, 代码是否报错
-  screenRecordEvents: string[] // 录屏信息
-  screenRecordId: number // 录屏 ID
+  screenRecordEvents: string[] // 屏幕录制信息
+  screenRecordId: number // 屏幕录制 ID
   loopTimer: number // 循环检测白屏使用的定时器 ID
   reportData: any // 上报的数据
   options: any // 配置信息
   subscribe: {
-    [key: string] : any // 订阅消息
+    [key: string]: any // 订阅消息
   }
   deviceInfo: {
     [key: string]: any // 设备信息
@@ -163,7 +170,7 @@ export interface ITraceDev {
 }
 
 export interface ISdkCore {
-  dataReporter: any // 上报的数据,
+  dataReporter: any // 数据上报
   breadcrumb: any // 用户行为
   options: any // 配置信息
   publish: any // 发布消息
@@ -172,26 +179,26 @@ export interface ISdkCore {
 export interface IWindow {
   chrome: {
     app: {
-      [key: string]: any;
+      [key: string]: any
     }
   }
-  history: any;
-  addEventListener: any;
-  innerWidth: number,
-  innerHeight: number;
-  onpopstate: any;
-  performance: any;
+  history: any
+  addEventListener: any
+  innerWidth: number
+  innerHeight: number
+  onpopstate: any
+  performance: any
   __traceDev__: {
-    [key: string]: any;
+    [key: string]: any
   }
 }
 
 export abstract class BasePlugin {
-  public type: string;
+  public type: string
   constructor(type: string) {
-    this.type = type;
+    this.type = type
   }
-  abstract setOptions(options: any): void;
-  abstract setSdkCore(sdkCore: ISdkCore): void;
-  abstract transform(data: any): void;
+  abstract setOptions(options: any): void
+  abstract setSdkCore(sdkCore: ISdkCore): void
+  abstract transformer(data: any): void
 }

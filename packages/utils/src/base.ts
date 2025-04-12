@@ -6,12 +6,7 @@ export function on(target: any, eventName: string, callback: IAnyFn, options = f
   target.addEventListener(eventName, callback, options)
 }
 
-export function replaceAop(
-  sourceObj: IAnyObject,
-  propKey: string,
-  wrapper: IAnyFn,
-  force = false
-) {
+export function replaceAop(sourceObj: IAnyObject, propKey: string, wrapper: IAnyFn, force = false) {
   if (!sourceObj) return
   if (propKey in sourceObj || force) {
     const originalFn = sourceObj[propKey]
