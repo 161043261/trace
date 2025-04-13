@@ -36,12 +36,12 @@ export enum BreadcrumbType {
   Custom = 'Custom'
 }
 
-export enum StatusCode {
+export enum OkOrError {
   Error = 'Error',
   Ok = 'Ok'
 }
 
-export enum EventType {
+export enum TraceType {
   Xhr = 'Xhr',
   Fetch = 'Fetch',
   Click = 'Click',
@@ -58,7 +58,9 @@ export enum EventType {
   WhiteScreen = 'WhiteScreen'
 }
 
-export enum HttpType {
+// ========== 暂未使用 ==========
+
+export enum RequestType {
   Xhr = 'Xhr', // XMLHttpRequest
   Fetch = 'Fetch' // fetch
 }

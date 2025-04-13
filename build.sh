@@ -6,14 +6,17 @@ echo "link-workspace-packages=true" >./.npmrc
 mkdir ./packages/constants/src \
   ./packages/core/src \
   ./packages/performance/src \
+  ./packages/screen-record/src \
   ./packages/types/src \
   ./packages/utils/src -p
 cd ./packages/constants && pnpm init && cd -
 cd ./packages/core && pnpm init && cd -
 cd ./packages/performance && pnpm init && cd -
+cd ./packages/screen-record && pnpm init && cd -
 cd ./packages/types && pnpm init && cd -
-echo "export function constants() { console.log('constants') }" >./packages/constants/src/index.ts
-echo "export function core() { console.log('core') }" >./packages/core/src/index.ts
-echo "export function performance() { console.log('performance') }" >./packages/performance/src/index.ts
-echo "export function types() { console.log('types') }" >./packages/types/src/index.ts
-echo "export function utils() { console.log('utils') }" >./packages/utils/src/index.ts
+echo "export function fn() { console.log('constants') }" >./packages/constants/src/index.ts
+echo "export function fn2() { console.log('core') }" >./packages/core/src/index.ts
+echo "export function fn3() { console.log('performance') }" >./packages/performance/src/index.ts
+echo "export function fn4() { console.log('screen-record') }" >./packages/screen-record/src/index.ts
+echo "export function fn5() { console.log('types') }" >./packages/types/src/index.ts
+echo "export function fn6() { console.log('utils') }" >./packages/utils/src/index.ts

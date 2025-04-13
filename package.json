@@ -9,7 +9,6 @@
     "lint": "eslint --fix --max-warnings=0"
   },
   "keywords": [
-    "Frontend Monitor SDK",
     "trace-dev"
   ],
   "author": "161043261.github.io",

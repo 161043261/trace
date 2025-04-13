@@ -1,6 +1,7 @@
+import { TraceType } from '@trace-dev/constants'
 import { IBreadcrumbData, IReportData } from './main'
 
-export interface ITraceConfig {
+export interface ITraceOptions {
   dsn: string // 数据上报的地址
   apiKey: string // 前端项目的 ID
   userId: string // 用户 ID
@@ -17,6 +18,7 @@ export interface ITraceConfig {
   traceWhiteScreen?: boolean // 是否开启白屏检测
   traceImageError: boolean // 是否上报图片错误
   screenRecordTime?: number // 单次屏幕录制时长
+  screenRecordTraceTypeList?: TraceType[]
   hasSkeleton?: boolean // 白屏时是否有骨架屏
   whiteScreenElements?: string[] // 白屏检测的元素列表
   urlRegExp: RegExp // 接口正则
@@ -32,6 +34,6 @@ export interface ITraceConfig {
 
 // 屏幕录制配置
 export interface IScreenRecordOptions {
-  screenRecordTypeList: string[]
-  screenRecordTime: number
+  traceTypeList: TraceType[]
+  duration: number
 }

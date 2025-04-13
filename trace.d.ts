@@ -11,11 +11,11 @@ declare interface Window {
     app?: Record<string, unknown>
   }
   __traceDev__: {
-    hasError: boolean // 某个时间段, 源代码是否报错
+    hasError: boolean // 某个时间段, 是否发生错误
     errorHashes: Set<string> // 存储源代码错误的 hash 值
     screenRecordEvents: string[] // 屏幕录制信息
-    screenRecordId: number // 屏幕录制 ID
-    loopTimer: number // 循环检测白屏使用的定时器 ID
+    screenRecordId: string // 屏幕录制 ID
+    timer: number // 循环检测白屏使用的定时器 ID
     reportData: unknown // 上报的数据
     options: unknown // 配置信息
     replacedRecord: Record<string, boolean>

@@ -1,19 +1,18 @@
-interface ICrumb {
-  timeStamp: number
-}
-
-export class _Breadcrumbs {
+export class MinHeap<T extends { timestamp: number }> {
   heapCap = 20
-  minHeap: ICrumb[] = []
-  constructor(maxBreadcrumbs_ = 20) {
-    this.heapCap = maxBreadcrumbs_
+  itemList: T[] = []
+
+  constructor(heapCap_ = 20) {
+    this.heapCap = heapCap_
   }
 
-  push(...data: ICrumb[]) {
-    data = data.slice(0, this.heapCap)
-    this.minHeap.unshift(...data)
-    this.minHeap.slice(0, this.heapCap)
-    this.buildMinHeap(data.length - 1, this.minHeap.length)
+  push(data: T) {
+    if (this.itemList.length === this.heapCap) {
+      this.itemList[0] = data
+    } else {
+      this.itemList.unshift(data)
+    }
+    this.minHeapify(0, this.itemList.length)
     return
   }
 
@@ -30,21 +29,25 @@ export class _Breadcrumbs {
     let childIdx = idx
     const left = idx * 2 + 1
     const right = idx * 2 + 2
-    if (left < heapSize && this.minHeap[left].timeStamp < this.minHeap[childIdx].timeStamp) {
+    if (left < heapSize && this.itemList[left].timestamp < this.itemList[childIdx].timestamp) {
       childIdx = left
     }
-    if (right < heapSize && this.minHeap[right].timeStamp < this.minHeap[childIdx].timeStamp) {
+    if (right < heapSize && this.itemList[right].timestamp < this.itemList[childIdx].timestamp) {
       childIdx = right
     }
     if (childIdx !== idx) {
-      ;[this.minHeap[idx], this.minHeap[childIdx]] = [this.minHeap[childIdx], this.minHeap[idx]]
+      ;[this.itemList[idx], this.itemList[childIdx]] = [this.itemList[childIdx], this.itemList[idx]]
       this.minHeapify(childIdx, heapSize)
     }
   }
 
   getAndClearHeap() {
-    const ret = this.minHeap
-    this.minHeap = []
-    return ret
+    const oldMinHeap = this.itemList
+    this.itemList = []
+    return oldMinHeap
+  }
+
+  clearHeap() {
+    this.itemList = []
   }
 }

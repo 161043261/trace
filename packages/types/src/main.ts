@@ -1,4 +1,5 @@
-import { BreadcrumbType, EventType, StatusCode } from '@trace-dev/constants'
+import { BreadcrumbType, TraceType, OkOrError } from '@trace-dev/constants'
+import { ITraceOptions } from './option'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFn = (...args: any[]) => any
@@ -7,32 +8,49 @@ export type VoidFn = (...args: any[]) => void
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyObject = Record<number | string | symbol, any>
 
-// todo: Without 在表达什么
-export type Without<T, U> = Partial<Record<Exclude<keyof T, keyof U>, never>>
-// todo: Xor 又在表达什么
-export type Xor<T, U> = (Without<T, U> & U) | (Without<U, T> & T)
+export interface IBaseData {
+  name?: string
+  okOrError?: OkOrError
+  timestamp?: number
+  traceType?: TraceType
+}
 
-// 身份验证信息
+export interface IBreadcrumbData {
+  traceType: TraceType
+  behaviorType: BreadcrumbType
+  statusCode: OkOrError
+}
+
+export interface IDataReporter {
+  send(
+    data:
+      | IReportData
+      | IHttpData
+      | IResourceError
+      | ILongTaskData
+      | IPerformanceData
+      | IMemoryData
+      | ISourceCodeError
+      | IScreenRecord
+      | Record<string, unknown>
+  ): void
+}
+
+//! [暂未使用] 身份验证信息
 export interface IAuthInfo {
   apiKey: string
   sdkVersion: string
   userId?: string
 }
 
-// 用户行为
-export interface IBehaviorData {
-  eventType: EventType // 事件类型
+//! [暂未使用] 用户行为
+export interface IUserEventData {
+  traceType: TraceType // 事件类型
   behaviorType: BreadcrumbType // 用户行为类型
-  statusCode: StatusCode
-  data: Xor<IHttpData, Xor<ISourceCodeError, IRouteHistory>>
+  statusCode: OkOrError
+  data: unknown
   message: string
   name?: string
-}
-
-export interface IBreadcrumbData {
-  eventType: EventType
-  behaviorType: BreadcrumbType
-  statusCode: StatusCode
 }
 
 export interface IDeviceInfo {
@@ -53,14 +71,16 @@ export interface IErrorData {
 
 // http 请求
 export interface IHttpData {
-  type?: string
+  name?: string
+  okOrError?: OkOrError
+  timestamp?: number
+  traceType?: TraceType
+
   method?: string
-  time: number
   url: string // 接口地址
   elapsedTime: number // 接口调用时长
   message: string // 接口信息
   statusCode?: number // http 状态码
-  status: string // 接口状态
   request?: {
     how: 'xhr' | 'fetch' // 请求类型: xhr 或 fetch
     method: string // 请求方式
@@ -71,16 +91,24 @@ export interface IHttpData {
     data: unknown
   }
 }
+
 // 长任务列表
-export interface ILongTask {
-  timestamp: number
-  name: string // longTask
-  longTask: [] // 长任务列表
+export interface ILongTaskData {
+  name?: string
+  okOrError?: OkOrError
+  timestamp?: number
+  traceType?: TraceType
+
+  longTask: PerformanceEntry // 长任务列表
 }
 
 // 内存信息
 export interface IMemoryData {
-  name: string
+  name?: string
+  okOrError?: OkOrError
+  timestamp?: number
+  traceType?: TraceType
+
   memory: {
     jsHeapSizeLimit: number
     totalJSHeapSize: number
@@ -91,17 +119,18 @@ export interface IMemoryData {
 export interface IReportData
   extends IHttpData,
     IResourceError,
-    ILongTask,
+    ILongTaskData,
     IPerformanceData,
     IMemoryData,
     ISourceCodeError,
     IScreenRecord {
-  type: string // 事件类型
-  pageUrl: string // 页面地址
+  name: string
+  okOrError: OkOrError // 事件状态
   timestamp: number // 发生的时间戳
+  type: TraceType // 事件类型
+  pageUrl: string // 页面地址
   uuid: string // 页面的唯一标识
   apiKey: string // 前端项目的 ID
-  status: string // 事件状态
   sdkVersion: string // SDK 的版本号
   breadcrumb: IBreadcrumbData[]
   // 设备信息
@@ -110,9 +139,13 @@ export interface IReportData
 
 // 性能指标
 export interface IPerformanceData {
-  name: string // FCP
-  value: number // 数值
-  level: string // 等级
+  name?: string
+  okOrError?: OkOrError
+  timestamp?: number
+  traceType?: TraceType
+
+  score: number // 分数
+  poorOrGood: 'poor' | 'good'
 }
 
 export interface IResourceData {
@@ -123,8 +156,11 @@ export interface IResourceData {
 
 // 资源加载失败
 export interface IResourceError {
-  timestamp: number
-  name: string // JS 脚本等
+  name?: string
+  okOrError?: OkOrError
+  timestamp?: number
+  traceType?: TraceType
+
   message: string // 资源加载失败的信息
 }
 
@@ -135,19 +171,29 @@ export interface IRouteHistory {
 
 // todo 屏幕录制信息
 export interface IScreenRecord {
-  key: string
-  events: string
+  name?: string
+  okOrError?: OkOrError
+  timestamp?: number
+  traceType?: TraceType
+
+  id: string
+  recordEvents: string
 }
 
 export interface ISdkCore {
-  dataReporter: unknown // 数据上报
+  dataReporter: IDataReporter // 数据上报
   breadcrumb: unknown // 用户行为
-  options: unknown // 配置信息
+  options: ITraceOptions // 配置信息
   publish: unknown // 发布消息
 }
 
 // 源代码错误
 export interface ISourceCodeError {
+  name?: string
+  okOrError?: OkOrError
+  timestamp?: number
+  traceType?: TraceType
+
   column: number
   line: number
   message: string
@@ -155,7 +201,7 @@ export interface ISourceCodeError {
 }
 
 export interface ISubscribeHandler {
-  type: EventType
+  type: TraceType
   callback: AnyFn
 }
 
@@ -170,12 +216,10 @@ export interface ITraceDev {
   deviceInfo: IDeviceInfo // 设备信息
 }
 
-export abstract class BasePlugin {
-  public type: string
-  constructor(type: string) {
+export abstract class TracePlugin {
+  public type: TraceType
+  constructor(type: TraceType) {
     this.type = type
   }
-  abstract setOptions(options: unknown): void
-  abstract setSdkCore(sdkCore: ISdkCore): void
-  abstract transformer(data: unknown): void
+  abstract useCore(sdkCore: ISdkCore): void
 }

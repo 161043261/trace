@@ -2,7 +2,7 @@
 import { AnyObject, AnyFn, VoidFn } from '@trace-dev/types' // monorepo
 import { typeChecker } from './type_checker'
 import { isBrowserEnv, setReplaceRecord, traceDev } from './global'
-import { EventType, HttpPhrase } from '@trace-dev/constants'
+import { TraceType, HttpPhrase } from '@trace-dev/constants'
 
 export function generateUUID(): string {
   if (isBrowserEnv() && window.crypto) {
@@ -37,9 +37,9 @@ export function getYmd(): string {
 }
 
 export function hasErrorHash(hash: string): boolean {
-  const hasOrNot = traceDev.errorHashes.has(hash)
-  if (!hasOrNot) traceDev.errorHashes.add(hash)
-  return hasOrNot
+  const hasHash = traceDev.errorHashes.has(hash)
+  if (!hasHash) traceDev.errorHashes.add(hash)
+  return hasHash
 }
 
 export function htmlElem2str(elem: HTMLElement): string {
@@ -87,11 +87,11 @@ export function httpCode2message(httpCode: number) {
   return HttpPhrase.UnknownError
 }
 
-export function nativeTryCatch(fn: VoidFn, errorFn: VoidFn) {
+export function nativeTryCatch(fn: VoidFn, errorFn?: VoidFn) {
   try {
     fn()
   } catch (err) {
-    if (err) {
+    if (err && errorFn) {
       errorFn(err)
     }
   }
@@ -132,14 +132,14 @@ export function setTrace(
   traceUnhandledRejection = true,
   traceWhiteScreen = true
 ) {
-  setReplaceRecord(EventType.Xhr, traceXhr)
-  setReplaceRecord(EventType.Fetch, traceFetch)
-  setReplaceRecord(EventType.Click, traceClick)
-  setReplaceRecord(EventType.History, traceHistory)
-  setReplaceRecord(EventType.Error, traceError)
-  setReplaceRecord(EventType.HashChange, traceHashChange)
-  setReplaceRecord(EventType.UnhandledRejection, traceUnhandledRejection)
-  setReplaceRecord(EventType.WhiteScreen, traceWhiteScreen)
+  setReplaceRecord(TraceType.Xhr, traceXhr)
+  setReplaceRecord(TraceType.Fetch, traceFetch)
+  setReplaceRecord(TraceType.Click, traceClick)
+  setReplaceRecord(TraceType.History, traceHistory)
+  setReplaceRecord(TraceType.Error, traceError)
+  setReplaceRecord(TraceType.HashChange, traceHashChange)
+  setReplaceRecord(TraceType.UnhandledRejection, traceUnhandledRejection)
+  setReplaceRecord(TraceType.WhiteScreen, traceWhiteScreen)
 }
 
 export function simpleTypeChecker(
