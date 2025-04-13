@@ -1,24 +1,27 @@
 import packageJson from '../../../package.json'
 
-export const SDK_NAME = 'trace'
+export const SDK_NAME = packageJson.name
 
 export const SDK_VERSION = packageJson.version
 
-export enum InterfaceStatus {
+export enum HttpPhrase {
   Ok = 'Ok',
-  DeadlineError = 'DeadlineError',
+  // httpCode >= 400 && httpCode < 500
   Unauthenticated = 'Unauthenticated',
   PermissionDenied = 'PermissionDenied',
-  NotFount = 'NotFount',
-  ResourceExhausted = 'ResourceExhausted',
-  InvalidArgument = 'InvalidArgument',
-  Unimplemented = 'Unimplemented',
-  Unavailable = 'Unavailable',
-  InternalError = 'InternalError',
-  UnknownError = 'UnknownError',
-  Cancelled = 'Cancelled',
+  NotFound = 'NotFound',
   AlreadyExist = 'AlreadyExist',
   FailedPrecondition = 'FailedPrecondition',
+  ResourceExhausted = 'ResourceExhausted',
+  InvalidArgument = 'InvalidArgument',
+  // httpCode >= 500 && httpCode < 600
+  Unimplemented = 'Unimplemented',
+  Unavailable = 'Unavailable',
+  DeadlineError = 'DeadlineError',
+  InternalError = 'InternalError',
+  UnknownError = 'UnknownError',
+  // other
+  Cancelled = 'Cancelled',
   Aborted = 'Aborted',
   OutOfRange = 'OutOfRange',
   DataLoss = 'DataLoss'
