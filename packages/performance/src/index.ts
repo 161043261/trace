@@ -13,8 +13,6 @@ import {
 import { getEntryList, getWebVitals } from './main'
 import { getTimestamp } from '@trace-dev/utils'
 
-// export * from './performance'
-
 export default class PerformancePlugin extends TracePlugin {
   constructor() {
     super(TraceType.Performance /** traceType */)

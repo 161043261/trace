@@ -44,7 +44,17 @@ importers:
 
   packages/constants: {}
 
-  packages/core: {}
+  packages/core:
+    dependencies:
+      '@trace-dev/constants':
+        specifier: workspace:^
+        version: link:../constants
+      '@trace-dev/types':
+        specifier: workspace:^
+        version: link:../types
+      '@trace-dev/utils':
+        specifier: workspace:^
+        version: link:../utils
 
   packages/performance:
     dependencies:

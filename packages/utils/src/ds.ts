@@ -1,3 +1,5 @@
+import { VoidFn } from '@trace-dev/types'
+
 export class MinHeap<T extends { timestamp: number }> {
   heapCap = 20
   itemList: T[] = []
@@ -49,5 +51,36 @@ export class MinHeap<T extends { timestamp: number }> {
 
   clearHeap() {
     this.itemList = []
+  }
+}
+
+export class VoidFnQueue {
+  private fnList: VoidFn[] = []
+
+  // run = this.runFnUseRequestIdleCallback;
+  push(fn: VoidFn, ctx?: unknown, ...args: unknown[]) {
+    this.runFnUseRequestIdleCallback(fn, ctx, ...args)
+  }
+
+  runFnUseRequestIdleCallback(fn: VoidFn, ctx?: unknown, ...args: unknown[]) {
+    if (typeof fn !== 'function') return
+    this.fnList.push(fn.bind(ctx, ...args))
+    requestIdleCallback(() => this.flushFnList())
+  }
+
+  runFnUsePromise(fn: VoidFn, ctx?: unknown, ...args: unknown[]) {
+    if (typeof fn !== 'function') return
+    this.fnList.push(fn.bind(ctx, ...args))
+    Promise.resolve().then(() => this.flushFnList())
+  }
+
+  clear() {
+    this.fnList = []
+  }
+
+  flushFnList() {
+    const oldFnList = this.fnList
+    this.fnList = []
+    oldFnList.forEach((fn) => fn())
   }
 }

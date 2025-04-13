@@ -1,10 +1,9 @@
 // pnpm install ua-parser-js --filter @trace-dev/utils
 import { UAParser } from 'ua-parser-js'
-import { typeChecker } from './type_checker'
 import { IDeviceInfo, ITraceDev } from '@trace-dev/types'
 
 export function isBrowserEnv() {
-  return typeChecker.isWindow(window)
+  return typeof window === 'object'
 }
 
 export function getTraceDev() {
@@ -12,7 +11,7 @@ export function getTraceDev() {
   return window.__traceDev__
 }
 
-export const traceDev = getTraceDev()
+export const traceDev = getTraceDev() as unknown as ITraceDev
 const uaResult = new UAParser().getResult()
 
 traceDev.deviceInfo = {

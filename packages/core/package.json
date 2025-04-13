@@ -20,5 +20,10 @@
   "repository": {
     "type": "git",
     "url": "git@github.com:161043261/trace.git"
+  },
+  "dependencies": {
+    "@trace-dev/constants": "workspace:^",
+    "@trace-dev/types": "workspace:^",
+    "@trace-dev/utils": "workspace:^"
   }
 }

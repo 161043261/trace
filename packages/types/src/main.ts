@@ -1,5 +1,5 @@
 import { BreadcrumbType, TraceType, OkOrError } from '@trace-dev/constants'
-import { ITraceOptions } from './option'
+import { ITraceOptions } from './options'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFn = (...args: any[]) => any
@@ -32,13 +32,12 @@ export interface IDataReporter {
       | IMemoryData
       | ISourceCodeError
       | IScreenRecord
-      | Record<string, unknown>
-  ): void
+  ): Promise<void>
 }
 
 //! [暂未使用] 身份验证信息
 export interface IAuthInfo {
-  apiKey: string
+  projectId: string
   sdkVersion: string
   userId?: string
 }
@@ -130,7 +129,7 @@ export interface IReportData
   type: TraceType // 事件类型
   pageUrl: string // 页面地址
   uuid: string // 页面的唯一标识
-  apiKey: string // 前端项目的 ID
+  projectId: string // 前端项目的 ID
   sdkVersion: string // SDK 的版本号
   breadcrumb: IBreadcrumbData[]
   // 设备信息
@@ -144,8 +143,9 @@ export interface IPerformanceData {
   timestamp?: number
   traceType?: TraceType
 
-  score: number // 分数
-  poorOrGood: 'poor' | 'good'
+  score?: number // 分数
+  poorOrGood?: 'poor' | 'good'
+  entryList?: PerformanceResourceTiming[]
 }
 
 export interface IResourceData {
@@ -176,7 +176,7 @@ export interface IScreenRecord {
   timestamp?: number
   traceType?: TraceType
 
-  id: string
+  screenRecordId: string
   recordEvents: string
 }
 
@@ -205,14 +205,17 @@ export interface ISubscribeHandler {
   callback: AnyFn
 }
 
+// 参考 trace.d.ts
 export interface ITraceDev {
   hasError: boolean // 某个时间段, 代码是否报错
+  errorHashes: Set<string> // 源代码错误的 hash 值的集合
   screenRecordEvents: string[] // 屏幕录制信息
-  screenRecordId: number // 屏幕录制 ID
-  loopTimer: number // 循环检测白屏使用的定时器 ID
+  screenRecordId: string // 屏幕录制 ID
+  whiteScreenTimer: number // 循环检测白屏使用的定时器 ID
   reportData: IReportData // 上报的数据
-  options: unknown // 配置信息
-  replacedSet: Record<string, boolean>
+  options: ITraceOptions // 配置信息
+  // todo
+  replacedRecord: Record<string, boolean>
   deviceInfo: IDeviceInfo // 设备信息
 }
 

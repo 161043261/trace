@@ -1,9 +1,10 @@
 import { TraceType } from '@trace-dev/constants'
 import { IBreadcrumbData, IReportData } from './main'
 
+// traceDev 配置
 export interface ITraceOptions {
   dsn: string // 数据上报的地址
-  apiKey: string // 前端项目的 ID
+  projectId: string // 前端项目的 ID
   userId: string // 用户 ID
   disabled: boolean // 是否禁用 SDK
   traceXhr?: boolean // 是否监听 XHRHttpRequest 请求
@@ -16,19 +17,21 @@ export interface ITraceOptions {
   tracePerformance?: boolean // 是否计算页面性能指标
   traceScreenRecord?: boolean // 是否开启屏幕录制
   traceWhiteScreen?: boolean // 是否开启白屏检测
+  // todo
   traceImageError: boolean // 是否上报图片错误
   screenRecordTime?: number // 单次屏幕录制时长
   screenRecordTraceTypeList?: TraceType[]
   hasSkeleton?: boolean // 白屏时是否有骨架屏
+  // todo
   whiteScreenElements?: string[] // 白屏检测的元素列表
   urlRegExp: RegExp // 接口正则
   clickThrottleDelay?: number // click 点击事件的节流时长
   requestTimeout?: number // 请求的超时时长
-  maxBreadcrumbs?: number // 存储用户行为的最大堆大小
+  maxBreadcrumbs?: number // 存储用户行为的小根堆的堆容量
   beforePushBreadcrumb?: (data: IBreadcrumbData) => IBreadcrumbData // 入堆前的 hook
-  beforeDataReport?: (data: IReportData) => Promise<IReportData | boolean> // 数据上报前的 hook
+  beforeReportData?: (data: IReportData) => Promise<IReportData | boolean> // 数据上报前的 hook
   getUserId?: () => string | number
-  handleHttpResponse?: (data: unknown) => boolean // 处理接口的响应
+  handleHttpResponse?: (data: unknown) => boolean // 处理 http 响应
   repeatSourceCodeError?: boolean // 是否重复上报源代码错误
 }
 

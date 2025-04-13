@@ -17,7 +17,7 @@ export function screenRecorder(dataReporter: IDataReporter, screenRecordDuration
             okOrError: OkOrError.Error,
             timestamp: getTimestamp(),
             traceType: TraceType.ScreenRecord,
-            id: screenRecordId,
+            screenRecordId: screenRecordId,
             recordEvents: compress(recordEventHeap.getAndClearHeap())
           })
           traceDev.hasError = false

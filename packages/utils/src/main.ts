@@ -1,6 +1,5 @@
 // pnpm add @trace-dev/types --filter @trace-dev/utils
 import { AnyObject, AnyFn, VoidFn } from '@trace-dev/types' // monorepo
-import { typeChecker } from './type_checker'
 import { isBrowserEnv, setReplaceRecord, traceDev } from './global'
 import { TraceType, HttpPhrase } from '@trace-dev/constants'
 
@@ -142,33 +141,6 @@ export function setTrace(
   setReplaceRecord(TraceType.WhiteScreen, traceWhiteScreen)
 }
 
-export function simpleTypeChecker(
-  target: unknown,
-  expectType:
-    | 'Array'
-    | 'Boolean'
-    | 'Function'
-    | 'Number'
-    | 'Null'
-    | 'String'
-    | 'Symbol'
-    | 'Object'
-    | 'Undefined'
-    | 'process' /** lowerCase */
-): boolean {
-  if (!target) return false
-  if (typeofAny(target) === expectType) return true
-  console.error(`[trace-dev] Expect ${expectType}, get ${typeofAny(target)}`)
-  return false
-}
-
-export function sliceStr(str: string, sliceLen: number) {
-  if (typeChecker.isString(str)) {
-    return str.slice(0, sliceLen) + (str.length > sliceLen ? `// str.slice(0, ${sliceLen})` : '')
-  }
-  return ''
-}
-
 export const throttle = (fn: AnyFn, delay: number) => {
   let canCall = true
   return function (ctx: unknown, ...args: unknown[]) {
@@ -187,16 +159,13 @@ export const throttle = (fn: AnyFn, delay: number) => {
 // Uncaught SyntaxError: Invalid or unexpected token
 // > Object.prototype.toString.call(1)
 // '[object Number]'
-export function typeofAny(target: unknown): string {
+export function typeofUnknown(target: unknown): string {
   // Object.prototype.toString.call(1) === '[object Number]'
-  return Object.prototype.toString.call(target).slice(8, -1)
+  return Object.prototype.toString.call(target).slice(8, -1).toLowerCase()
 }
 
 export function unknown2str(target: unknown): string {
-  if (typeChecker.isString(target)) {
-    return target as string
-  }
-  if (typeChecker.isUndefined(target)) {
+  if (target === undefined) {
     return 'undefined'
   }
   // JSON.stringify(undefined) === undefined

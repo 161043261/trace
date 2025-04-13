@@ -1,3 +1,7 @@
+// pnpm add @trace-dev/constants --filter @trace-dev/core
+// pnpm add @trace-dev/utils --filter @trace-dev/core
+// pnpm add @trace-dev/types --filter @trace-dev/core
+
 // import PerformancePlugin from '@trace-dev/performance'
 // import { AnyFn } from '@trace-dev/types'
 // import { nativeTryCatch } from '@trace-dev/utils'
@@ -21,6 +25,6 @@
 // export function use(Plugin: typeof PerformancePlugin, options: unknown) {
 //   const plugin = new Plugin()
 //   nativeTryCatch(() => {
-//     plugin.useSdkCore({})
+//     plugin.useCore({})
 //   })
 // }
