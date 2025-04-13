@@ -12,6 +12,7 @@ export function getTraceDev() {
 }
 
 export const traceDev = getTraceDev() as unknown as ITraceDev
+
 const uaResult = new UAParser().getResult()
 
 traceDev.deviceInfo = {

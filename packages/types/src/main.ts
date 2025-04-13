@@ -15,28 +15,20 @@ export interface IBaseData {
   traceType?: TraceType
 }
 
-export interface IBreadcrumbData {
-  traceType: TraceType
-  behaviorType: BreadcrumbType
-  statusCode: OkOrError
+export interface IBreadcrumbData extends IBaseData {
+  name?: string
+  okOrError?: OkOrError
+  timestamp?: number
+  traceType?: TraceType
+  breadcrumbType?: BreadcrumbType
 }
 
 export interface IDataReporter {
-  send(
-    data:
-      | IReportData
-      | IHttpData
-      | IResourceError
-      | ILongTaskData
-      | IPerformanceData
-      | IMemoryData
-      | ISourceCodeError
-      | IScreenRecord
-  ): Promise<void>
+  send(data: IReportData): Promise<void>
 }
 
 //! [暂未使用] 身份验证信息
-export interface IAuthInfo {
+export interface IUserInfo {
   projectId: string
   sdkVersion: string
   userId?: string
@@ -69,19 +61,18 @@ export interface IErrorData {
 }
 
 // http 请求
-export interface IHttpData {
+export interface IHttpData extends IBaseData {
   name?: string
   okOrError?: OkOrError
   timestamp?: number
   traceType?: TraceType
-
   method?: string
-  url: string // 接口地址
-  elapsedTime: number // 接口调用时长
-  message: string // 接口信息
+  url?: string // 接口地址
+  elapsedTime?: number // 接口调用时长
+  message?: string // 接口信息
   statusCode?: number // http 状态码
   request?: {
-    how: 'xhr' | 'fetch' // 请求类型: xhr 或 fetch
+    type: 'xhr' | 'fetch' // 请求类型: xhr 或 fetch
     method: string // 请求方式
     data: unknown
   }
@@ -92,23 +83,21 @@ export interface IHttpData {
 }
 
 // 长任务列表
-export interface ILongTaskData {
+export interface ILongTaskData extends IBaseData {
   name?: string
   okOrError?: OkOrError
   timestamp?: number
   traceType?: TraceType
-
-  longTask: PerformanceEntry // 长任务列表
+  longTask?: PerformanceEntry // 长任务列表
 }
 
 // 内存信息
-export interface IMemoryData {
+export interface IMemoryData extends IBaseData {
   name?: string
   okOrError?: OkOrError
   timestamp?: number
   traceType?: TraceType
-
-  memory: {
+  memory?: {
     jsHeapSizeLimit: number
     totalJSHeapSize: number
     usedJSHeapSize: number
@@ -123,17 +112,17 @@ export interface IReportData
     IMemoryData,
     ISourceCodeError,
     IScreenRecord {
-  name: string
-  okOrError: OkOrError // 事件状态
-  timestamp: number // 发生的时间戳
-  type: TraceType // 事件类型
+  name?: string
+  okOrError?: OkOrError // 事件状态
+  timestamp?: number // 发生的时间戳
+  type?: TraceType // 事件类型
   pageUrl: string // 页面地址
-  uuid: string // 页面的唯一标识
-  projectId: string // 前端项目的 ID
-  sdkVersion: string // SDK 的版本号
-  breadcrumb: IBreadcrumbData[]
+  reportId: string // 上报数据的 ID
+  projectId?: string // 前端项目的 ID
+  sdkVersion?: string // SDK 的版本号
+  breadcrumb?: IBreadcrumbData[]
   // 设备信息
-  deviceInfo: IDeviceInfo
+  deviceInfo?: IDeviceInfo
 }
 
 // 性能指标
@@ -160,8 +149,7 @@ export interface IResourceError {
   okOrError?: OkOrError
   timestamp?: number
   traceType?: TraceType
-
-  message: string // 资源加载失败的信息
+  message?: string // 资源加载失败的信息
 }
 
 export interface IRouteHistory {
@@ -170,14 +158,13 @@ export interface IRouteHistory {
 }
 
 // todo 屏幕录制信息
-export interface IScreenRecord {
+export interface IScreenRecord extends IBaseData {
   name?: string
   okOrError?: OkOrError
   timestamp?: number
   traceType?: TraceType
-
-  screenRecordId: string
-  recordEvents: string
+  screenRecordId?: string
+  recordEvents?: string
 }
 
 export interface ISdkCore {
@@ -193,11 +180,10 @@ export interface ISourceCodeError {
   okOrError?: OkOrError
   timestamp?: number
   traceType?: TraceType
-
-  column: number
-  line: number
-  message: string
-  filename: string // 报错的文件名
+  column?: number
+  line?: number
+  message?: string
+  filename?: string // 报错的文件名
 }
 
 export interface ISubscribeHandler {
@@ -212,7 +198,7 @@ export interface ITraceDev {
   screenRecordEvents: string[] // 屏幕录制信息
   screenRecordId: string // 屏幕录制 ID
   whiteScreenTimer: number // 循环检测白屏使用的定时器 ID
-  reportData: IReportData // 上报的数据
+  dataReporter: IDataReporter // 上报的数据
   options: ITraceOptions // 配置信息
   // todo
   replacedRecord: Record<string, boolean>
