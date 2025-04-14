@@ -30,7 +30,7 @@ export interface ITraceOptions {
   maxBreadcrumbs?: number // 存储用户行为的小根堆的堆容量
   beforePushBreadcrumb?: (data: IBreadcrumbItem) => IBreadcrumbItem // 入堆前的 hook
   beforeReportData?: (data: IReportData) => Promise<IReportData> // 数据上报前的 hook
-  httpErrorCallback?: (data: unknown) => boolean // 处理 http 响应
+  httpErrorHandler?: (data: unknown) => boolean // 处理 http 错误的回调函数
   repeatSourceCodeError?: boolean // 是否重复上报源代码错误
 }
 

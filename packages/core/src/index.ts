@@ -6,9 +6,8 @@ import PerformancePlugin from '@trace-dev/performance'
 import ScreenRecordPlugin from '@trace-dev/screen-record'
 import { ITraceOptions } from '@trace-dev/types'
 import { nativeTryCatch } from '@trace-dev/utils'
-import { TraceOptions } from './main'
+import { TraceOptions, dataReporter } from './main'
 import { SDK_NAME, SDK_VERSION } from '@trace-dev/constants'
-import dataReporter from './data_reporter'
 
 function init(options: ITraceOptions) {
   const traceOptions = TraceOptions.traceOptions

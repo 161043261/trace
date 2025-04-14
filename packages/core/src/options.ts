@@ -28,17 +28,13 @@ export class TraceOptions implements ITraceOptions {
       TraceType.Fetch,
       TraceType.Xhr
     ],
-    repeatSourceCodeError: false,
+    hasSkeleton: false,
+    whiteScreenElements: ['html', 'body', '#app', '#root'],
+    // ignoredUrlRegExp?: RegExp // 接口正则
+    clickThrottleDelay: 0,
+    requestTimeout: 10, // 单位 s
     maxBreadcrumbs: 20,
-    beforePushBreadcrumb: undefined,
-    beforeReportData: undefined,
-    whiteScreenElements: ['html', 'body', '#app', '#root']
-
-    // hasSkeleton?: false,
-    // urlRegExp?: RegExp
-    // clickThrottleDelay?: number
-    // requestTimeout?: number
-    // httpErrorCallback ?: (data: unknown) => boolean
+    repeatSourceCodeError: false
   }
 
   static #traceOptions = new TraceOptions()

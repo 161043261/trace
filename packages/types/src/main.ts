@@ -1,4 +1,4 @@
-import { BreadcrumbType, TraceType, OkOrError } from '@trace-dev/constants'
+import { BreadcrumbType, TraceType, OkOrError, RequestType } from '@trace-dev/constants'
 import { ITraceOptions } from './options'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,9 +47,8 @@ export interface IDeviceInfo {
   deviceModel: string // 设备描述
 }
 
-//! [暂未使用]
-export interface IErrorData {
-  localName?: string
+export interface IErrorData extends ISourceCodeError, IResourceError {
+  errorType: TraceType.Vue | TraceType.React | TraceType.Resource
   error?: unknown
   message: string
 }
@@ -59,20 +58,14 @@ export interface IHttpData extends IBaseData {
   // okOrError?: OkOrError
   // timestamp?: number
   // traceType?: TraceType
-  method?: string
-  url?: string // 接口地址
-  elapsedTime?: number // 接口调用时长
+  method: string
+  url: string // 接口地址
+  elapsedTime: number // 接口调用时长
   message?: string // 接口信息
-  statusCode?: number // http 状态码
-  request?: {
-    type: 'xhr' | 'fetch' // 请求类型: xhr 或 fetch
-    method: string // 请求方式
-    data: unknown
-  }
-  response?: {
-    statusCode: number // http 状态码
-    data: unknown
-  }
+  statusCode: number // http 状态码
+  requestType: RequestType // 请求类型: xhr 或 fetch
+  requestData?: unknown
+  responseData?: unknown
 }
 
 export interface ILongTaskData extends IBaseData {
@@ -95,15 +88,7 @@ export interface IMemoryData extends IBaseData {
   }
 }
 
-export interface IReportData
-  extends IHttpData,
-    // IBreadcrumbData,
-    IResourceData,
-    ILongTaskData,
-    IPerformanceData,
-    IMemoryData,
-    ISourceCodeData,
-    IScreenRecordData {
+export interface IReportData extends IBaseData {
   name?: string
   okOrError?: OkOrError // 事件状态
   timestamp?: number // 发生的时间戳
@@ -129,14 +114,15 @@ export interface IPerformanceData extends IBaseData {
   entryList?: PerformanceResourceTiming[]
 }
 
-export interface IResourceData extends IBaseData {
+// 资源加载错误
+export interface IResourceError extends IBaseData {
   // name?: string
   // okOrError?: OkOrError
   // timestamp?: number
   // traceType?: TraceType
   src?: string
   href?: string
-  localName?: string
+  resourceName?: string
   message?: string // 资源加载失败的信息
 }
 
@@ -156,7 +142,7 @@ export interface IScreenRecordData extends IBaseData {
 }
 
 // 源代码错误
-export interface ISourceCodeData extends IBaseData {
+export interface ISourceCodeError extends IBaseData {
   // name?: string
   // okOrError?: OkOrError
   // timestamp?: number

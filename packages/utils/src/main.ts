@@ -1,6 +1,6 @@
 import { AnyObject, AnyFn, VoidFn } from '@trace-dev/types' // monorepo
 import { isBrowserEnv, setReplaceRecord, traceDev } from './global'
-import { TraceType, HttpPhrase } from '@trace-dev/constants'
+import { TraceType, StatusPhrase } from '@trace-dev/constants'
 
 export function generateUUID(): string {
   if (isBrowserEnv() && globalThis.crypto) {
@@ -50,39 +50,39 @@ export function htmlElem2str(elem: HTMLElement): string {
   return `<${tagName}${idStr}${classNames}>${innerHTML}</${tagName}>`
 }
 
-export function httpCode2message(httpCode: number) {
-  if (httpCode < 400) return HttpPhrase.Ok
-  if (httpCode >= 400 && httpCode < 500) {
-    switch (httpCode) {
+export function statusCode2phrase(statusCode: number) {
+  if (statusCode < 400) return StatusPhrase.Ok
+  if (statusCode >= 400 && statusCode < 500) {
+    switch (statusCode) {
       case 401:
-        return HttpPhrase.Unauthenticated
+        return StatusPhrase.Unauthenticated
       case 403:
-        return HttpPhrase.PermissionDenied
+        return StatusPhrase.PermissionDenied
       case 404:
-        return HttpPhrase.NotFound
+        return StatusPhrase.NotFound
       case 409:
-        return HttpPhrase.AlreadyExist
+        return StatusPhrase.AlreadyExist
       case 413:
-        return HttpPhrase.FailedPrecondition
+        return StatusPhrase.FailedPrecondition
       case 429:
-        return HttpPhrase.ResourceExhausted
+        return StatusPhrase.ResourceExhausted
       default:
-        return HttpPhrase.InvalidArgument
+        return StatusPhrase.InvalidArgument
     }
   }
-  if (httpCode >= 500 && httpCode < 600) {
-    switch (httpCode) {
+  if (statusCode >= 500 && statusCode < 600) {
+    switch (statusCode) {
       case 501:
-        return HttpPhrase.Unimplemented
+        return StatusPhrase.Unimplemented
       case 503:
-        return HttpPhrase.Unavailable
+        return StatusPhrase.Unavailable
       case 504:
-        return HttpPhrase.DeadlineError
+        return StatusPhrase.DeadlineError
       default:
-        return HttpPhrase.InternalError
+        return StatusPhrase.InternalError
     }
   }
-  return HttpPhrase.UnknownError
+  return StatusPhrase.UnknownError
 }
 
 export function nativeTryCatch(fn: VoidFn, errorFn?: VoidFn) {

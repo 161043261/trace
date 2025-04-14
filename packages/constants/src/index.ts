@@ -4,9 +4,8 @@ export const SDK_NAME = packageJson.name
 
 export const SDK_VERSION = packageJson.version
 
-export enum HttpPhrase {
+export enum StatusPhrase {
   Ok = 'Ok',
-  // httpCode >= 400 && httpCode < 500
   Unauthenticated = 'Unauthenticated',
   PermissionDenied = 'PermissionDenied',
   NotFound = 'NotFound',
@@ -14,13 +13,11 @@ export enum HttpPhrase {
   FailedPrecondition = 'FailedPrecondition',
   ResourceExhausted = 'ResourceExhausted',
   InvalidArgument = 'InvalidArgument',
-  // httpCode >= 500 && httpCode < 600
   Unimplemented = 'Unimplemented',
   Unavailable = 'Unavailable',
   DeadlineError = 'DeadlineError',
   InternalError = 'InternalError',
   UnknownError = 'UnknownError',
-  // other
   Cancelled = 'Cancelled',
   Aborted = 'Aborted',
   OutOfRange = 'OutOfRange',
@@ -63,13 +60,12 @@ export enum RequestType {
   Fetch = 'Fetch' // fetch
 }
 
-// ========== 暂未使用 ==========
-export enum HttpCode {
+export enum StatusCode {
   BadRequest = 400,
   Unauthorized = 401
 }
 
-export enum HttpMethod {
+export enum RequestMethod {
   Options = 'OPTIONS',
   Get = 'GET',
   Post = 'POST',

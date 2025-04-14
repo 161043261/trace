@@ -1,8 +1,8 @@
-import { HttpMethod, RequestType, TraceType } from '@trace-dev/constants'
-import { ITraceHandler, VoidFn } from '@trace-dev/types'
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { RequestMethod, RequestType, TraceType } from '@trace-dev/constants'
+import { IHttpData, ITraceHandler, VoidFn } from '@trace-dev/types'
 import { getTimestamp, replaceAop, throttle, traceDev } from '@trace-dev/utils'
-import { publishTraceHandlers, subscribeTraceHandlers } from './pubsub'
-import dataReporter from './data_reporter'
+import { publishTraceHandlers, subscribeTraceHandlers, dataReporter } from './main'
 
 function isIgnoredUrl(url: string) {
   return traceDev.options.ignoredUrlRegExp && traceDev.options.ignoredUrlRegExp.test(url)
@@ -13,22 +13,28 @@ function replace(type: TraceType) {
     case TraceType.WhiteScreen: // WhiteScreen
       handleWhiteScreen()
       break
+
     case TraceType.Click: // Click
       listenClick()
       break
+
     case TraceType.Error: // Error
     case TraceType.Fetch: // Fetch
       replaceFetch()
       break
+
     case TraceType.HashChange: // HashChange
       listenHashChange()
       break
+
     case TraceType.History: // History
       replaceHistory()
       break
+
     case TraceType.Xhr: // Xhr
       replaceXhr()
       break
+
     case TraceType.UnhandledRejection: // UnhandledRejection
       replaceUnhandledRejection()
       break
@@ -45,17 +51,12 @@ function replaceXhr() {
   replaceAop(originalXhrProto, 'open', (originalOpen: VoidFn) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return function (ctx: any, ...args: any[]) {
-      console.log(ctx, args)
       ctx.xhrTraceData = {
         method: typeof args[0] === 'string' ? args[0].toUpperCase() : args[0],
         url: args[1],
         timestamp: getTimestamp(),
-        requestType: RequestType.Xhr,
-        requestData: '',
-        responseData: '',
-        // todo status 类型
-        status: undefined
-      }
+        requestType: RequestType.Xhr
+      } as IHttpData
       originalOpen.apply(ctx, args)
     }
   })
@@ -63,22 +64,21 @@ function replaceXhr() {
   replaceAop(originalXhrProto, 'send', (originalSend: VoidFn) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return function (ctx: any, ...args: any) {
-      const { method, url } = ctx.xhrTraceData
-      console.log(ctx, args)
+      const xhrTraceData = ctx.xhrTraceData as IHttpData
+      const { method, url } = xhrTraceData
       ctx.addEventListener('loadend', () => {
-        if ((method === HttpMethod.Post && dataReporter.isSdkDsn(url)) || isIgnoredUrl(url)) {
+        if ((method === RequestMethod.Post && dataReporter.isSdkDsn(url!)) || isIgnoredUrl(url!)) {
           return
         }
         const { responseType, response, status } = ctx
-        ctx.xhrTraceData.requestData = args[0]
+        xhrTraceData.requestData = args[0]
         const endTime = getTimestamp()
-        ctx.xhrTraceData.status = status
+        xhrTraceData.statusCode = Number.parseInt(status)
         if (['', 'json', 'text'].includes(responseType)) {
-          ctx.xhrTraceData.responseData =
-            typeof response === 'object' ? JSON.stringify(response) : response
+          xhrTraceData.responseData = JSON.stringify(response)
         }
-        ctx.xhrTraceData.elapsedTime = endTime - ctx.xhrTraceData.startTime
-        publishTraceHandlers(TraceType.Xhr, ctx.xhrTraceData)
+        xhrTraceData.elapsedTime = endTime - xhrTraceData.timestamp!
+        publishTraceHandlers(TraceType.Xhr, xhrTraceData)
       })
       originalSend.apply(ctx, args)
     }
@@ -91,18 +91,21 @@ function replaceFetch() {
     return function (url: string, options: any) {
       const startTime = getTimestamp()
       const method = options?.method ?? 'GET'
-      const fetchTraceData = {
+      const fetchTraceData: IHttpData = {
+        timestamp: getTimestamp(),
         requestType: RequestType.Fetch,
         method,
         requestData: options && options.body,
         url,
         responseData: '',
         elapsedTime: 0,
-        status: 0
+        statusCode: 0
       }
       const headers = new Headers(options.headers ?? {})
+      // 使用 Object.assign
       Object.assign(headers, { setRequestHeader: headers.set })
-      options = Object.assign({}, options, headers)
+      // 使用解构赋值
+      options = { ...options, ...headers }
       return originalFetch.apply(globalThis, [url, options]).then(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (res: any) => {
@@ -110,9 +113,12 @@ function replaceFetch() {
           const resClone = res.clone()
           const endTime = getTimestamp()
           fetchTraceData.elapsedTime = endTime - startTime
-          fetchTraceData.status = resClone.status
+          fetchTraceData.statusCode = resClone.status
           resClone.text().then((res: string) => {
-            if ((method === HttpMethod.Post && dataReporter.isSdkDsn(url)) || isIgnoredUrl(url)) {
+            if (
+              (method === RequestMethod.Post && dataReporter.isSdkDsn(url)) ||
+              isIgnoredUrl(url)
+            ) {
               return
             }
             fetchTraceData.responseData = res
@@ -122,11 +128,11 @@ function replaceFetch() {
         },
         (err: unknown) => {
           const endTime = getTimestamp()
-          if ((method === HttpMethod.Post && dataReporter.isSdkDsn(url)) || isIgnoredUrl(url)) {
+          if ((method === RequestMethod.Post && dataReporter.isSdkDsn(url)) || isIgnoredUrl(url)) {
             return
           }
           fetchTraceData.elapsedTime = endTime - startTime
-          fetchTraceData.status = 0
+          fetchTraceData.statusCode = 0
           publishTraceHandlers(TraceType.Fetch, fetchTraceData)
           throw err
         }

@@ -1,7 +1,6 @@
 import { SDK_VERSION, TraceType } from '@trace-dev/constants'
 import { IDataReporter, IReportData, IScreenRecordData, ITraceOptions } from '@trace-dev/types'
 import { generateUUID, isBrowserEnv, traceDev, VoidFnQueue } from '@trace-dev/utils'
-
 import { breadcrumb } from './main'
 
 export class DataReporter implements IDataReporter {
