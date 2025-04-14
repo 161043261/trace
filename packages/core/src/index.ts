@@ -4,38 +4,28 @@
 
 import PerformancePlugin from '@trace-dev/performance'
 import ScreenRecordPlugin from '@trace-dev/screen-record'
-import { AnyFn, ITraceOptions } from '@trace-dev/types'
+import { ITraceOptions } from '@trace-dev/types'
 import { nativeTryCatch } from '@trace-dev/utils'
 import { TraceOptions } from './main'
+import { SDK_NAME, SDK_VERSION } from '@trace-dev/constants'
+import dataReporter from './data_reporter'
 
-function init(option: ITraceOptions) {
+function init(options: ITraceOptions) {
   const traceOptions = TraceOptions.traceOptions
-  traceOptions.setOptions(option)
+  traceOptions.setOptions(options)
+  dataReporter.setOptions(traceOptions)
 }
 
-export const vuePluginObj = {
-  install(app: { config: { errorHandler: AnyFn } }, options: ITraceOptions) {
-    app.config.errorHandler = (err, instance, info) => {
-      // 错误上报
-      // err 错误对象
-      // instance 触发该错误的组件实例
-      // info 错误来源信息, 例如错误在哪个生命周期钩子上抛出
-      console.error(err, instance, info)
-      init(options)
-    }
-  }
-}
-
-// 也可以是一个安装函数
-export function vuePluginFn(app: { config: { errorHandler: AnyFn } }, options: ITraceOptions) {
-  app.config.errorHandler = (err, instance, info) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function vuePluginFn(app: any, options: ITraceOptions) {
+  app.config.errorHandler = (err: unknown, instance: unknown, info: string) => {
     // 错误上报
     // err 错误对象
     // instance 触发该错误的组件实例
     // info 错误来源信息, 例如错误在哪个生命周期钩子上抛出
     console.error(err, instance, info)
-    init(options)
   }
+  init(options)
 }
 
 export function use(Plugin: typeof PerformancePlugin | typeof ScreenRecordPlugin) {
@@ -44,3 +34,13 @@ export function use(Plugin: typeof PerformancePlugin | typeof ScreenRecordPlugin
     plugin.init()
   })
 }
+
+const vuePlugin = {
+  SDK_VERSION,
+  SDK_NAME,
+  init,
+  install: vuePluginFn,
+  use
+}
+
+export default vuePlugin

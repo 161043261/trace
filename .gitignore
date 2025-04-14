@@ -34,3 +34,5 @@ stats.html
 plugins/assets/*.json
 !plugins/assets/admin_menu.json
 !plugins/assets/user_menu.json
+
+packages/chahan/

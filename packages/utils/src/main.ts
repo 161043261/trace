@@ -1,4 +1,3 @@
-// pnpm add @trace-dev/types --filter @trace-dev/utils
 import { AnyObject, AnyFn, VoidFn } from '@trace-dev/types' // monorepo
 import { isBrowserEnv, setReplaceRecord, traceDev } from './global'
 import { TraceType, HttpPhrase } from '@trace-dev/constants'

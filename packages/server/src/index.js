@@ -1,37 +1,43 @@
-// pnpm install koa @koa/router @koa/cors koa-bodyparser --filter @trace-dev/server
-import Koa from 'koa'
-import Router from '@koa/router'
-import cors from '@koa/cors'
-import bodyParser from 'koa-bodyparser'
-import fs from 'node:fs'
-import process from 'node:process'
+// pnpm install body-parser express co-body --filter @trace-dev/server
+import express from 'express'
+import bodyParser from 'body-parser'
+import coBody from 'co-body'
 
-const app = new Koa()
-const router = new Router()
-app.use(cors({ origin: '*', allowMethods: ['*'], allowHeaders: ['*'] }))
-app.use(bodyParser())
-router.post('/trace', async (ctx) => {
-  try {
-    const body = ctx.request.body
-    process.stdout.write(body, '\n')
-    const content = `${new Date().toISOString()} ${JSON.stringify(body)}\n`
-    fs.appendFileSync('trace.log', content)
-    ctx.status = 200
-    ctx.body = {
-      code: 200,
-      message: 'OK'
-    }
-  } catch (err) {
-    process.stdout.write(err, '\n')
-    ctx.status = 500
-    ctx.body = {
-      code: 500,
-      message: 'Internal Server Error'
-    }
+const app = express()
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+function cors(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Headers', '*')
+  res.header('Access-Control-Allow-Credentials', true)
+  res.header('Access-Control-Allow-Methods', '*')
+  res.header('Content-type', 'application/json;charset=utf-8')
+  // 预检 (pre-flight) 请求
+  if (req.method.toLowerCase() === 'options') {
+    res.sendStatus(200)
+  } else {
+    next()
   }
+}
+
+app.use(bodyParser.json({ limit: '100mb' }))
+app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }))
+
+const router = express.Router()
+
+router.post('/', async (req, res) => {
+  console.log(await coBody.json(req))
+  res.end()
 })
-app.use(router.routes()).use(router.allowedMethods())
+
+app.use('/trace', cors, router)
+
 const port = 3333
 app.listen(port, () => {
-  process.stdout.write(`server: http://localhost:${port}\n`)
+  console.log(`[server] http://localhost:${port}/`)
 })

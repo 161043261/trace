@@ -6,12 +6,31 @@ import { breadcrumb } from './main'
 
 export class DataReporter implements IDataReporter {
   queue = new VoidFnQueue() // 回调函数队列
-  dsn = traceDev.options.dsn // 数据上报的地址
-  projectId = traceDev.options.projectId ?? 'undefined' // 前端项目的 ID
-  userId = traceDev.options.userId ?? 'undefined' // 用户 ID
-  useImageReport = traceDev.options.useImageReport ?? false
-  beforeReportData = traceDev.options.beforeReportData
   reportId: string
+  dsn = '' // 必填
+  projectId?: string
+  userId?: string
+  useImageReport?: boolean
+  beforeReportData?: (data: IReportData) => Promise<IReportData>
+
+  static #dataReporter: DataReporter
+
+  static get dataReporter() {
+    if (!this.#dataReporter) {
+      this.#dataReporter = new DataReporter()
+    }
+    return this.#dataReporter
+  }
+
+  setOptions(options: ITraceOptions) {
+    console.log(options)
+    const { dsn, projectId, userId, useImageReport, beforeReportData } = options
+    this.dsn = dsn
+    this.projectId = projectId
+    this.userId = userId
+    this.useImageReport = useImageReport
+    this.beforeReportData = beforeReportData
+  }
 
   constructor() {
     this.reportId = generateUUID()
@@ -67,6 +86,7 @@ export class DataReporter implements IDataReporter {
 
   async send(data: IReportData) {
     const dsn = this.dsn
+    console.log(traceDev.options)
     if (dsn === '') {
       console.error('[trace-dev] DSN is empty')
       return
@@ -96,5 +116,5 @@ export class DataReporter implements IDataReporter {
   }
 }
 
-const dataReporter = traceDev.dataReporter || (traceDev.dataReporter = new DataReporter())
-export { dataReporter }
+traceDev.dataReporter = DataReporter.dataReporter
+export default DataReporter.dataReporter

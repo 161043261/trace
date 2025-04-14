@@ -20,3 +20,10 @@ echo "export function fn3() { console.log('performance') }" >./packages/performa
 echo "export function fn4() { console.log('screen-record') }" >./packages/screen-record/src/index.ts
 echo "export function fn5() { console.log('types') }" >./packages/types/src/index.ts
 echo "export function fn6() { console.log('utils') }" >./packages/utils/src/index.ts
+
+cd packages && rm -rf chahan
+git clone git@github.com:161043261/chahan.git
+rm -rf chahan/chahan-dev chahan/.git
+pnpm add @trace-dev/core --filter @trace-dev/chahan
+pnpm add @trace-dev/performance --filter @trace-dev/chahan
+pnpm add @trace-dev/screen-record --filter @trace-dev/chahan

@@ -1,12 +1,10 @@
 import { BreadcrumbType, TraceType } from '@trace-dev/constants'
-import { IBreadcrumbItem } from '@trace-dev/types'
+import { IBreadcrumbItem, IReportData, ITraceOptions } from '@trace-dev/types'
 import { MinHeap, traceDev } from '@trace-dev/utils'
 
 export class Breadcrumb extends MinHeap<IBreadcrumbItem> {
-  maxBreadcrumb = traceDev.options.maxBreadcrumbs ?? 20
-  beforePushBreadcrumb = traceDev.options.beforePushBreadcrumb
-
   static #breadcrumb: Breadcrumb
+  beforeReportData?: (data: IReportData) => Promise<IReportData>
 
   public static get breadcrumb() {
     if (!Breadcrumb.#breadcrumb) {
@@ -15,13 +13,14 @@ export class Breadcrumb extends MinHeap<IBreadcrumbItem> {
     return Breadcrumb.#breadcrumb
   }
 
-  private constructor() {
-    super(traceDev.options.maxBreadcrumbs ?? 20)
+  setOptions(options: ITraceOptions) {
+    this.heapCap = options.maxBreadcrumbs ?? 20
+    this.beforeReportData = options.beforeReportData
   }
 
   push(data: IBreadcrumbItem) {
-    if (this.beforePushBreadcrumb) {
-      data = this.beforePushBreadcrumb(data)
+    if (traceDev.options.beforePushBreadcrumb) {
+      data = traceDev.options.beforePushBreadcrumb(data)
     }
     super.push(data)
   }

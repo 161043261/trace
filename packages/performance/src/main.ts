@@ -103,7 +103,7 @@ export function getEntryList(): PerformanceResourceTiming[] {
     (entry) => !['fetch', 'xmlhttprequest', 'beacon'].includes(entry.initiatorType)
   )
   if (entryList.length > 0) {
-    entryList = window.structuredClone(entryList)
+    // entryList = window.structuredClone(entryList)
     entryList.forEach((entry) => {
       entry.fromCache = isFromCache(entry)
     })

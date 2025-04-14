@@ -19,9 +19,8 @@
     "url": "git@github.com:161043261/trace.git"
   },
   "dependencies": {
-    "@koa/cors": "^5.0.0",
-    "@koa/router": "^13.1.0",
-    "koa": "^2.16.1",
-    "koa-bodyparser": "^4.4.1"
+    "body-parser": "^2.2.0",
+    "co-body": "^6.2.0",
+    "express": "^5.1.0"
   }
 }
