@@ -182,5 +182,5 @@ export abstract class TracePlugin {
 
 export interface ITraceHandler {
   traceType: TraceType
-  fnList: AnyFn[]
+  handler: AnyFn
 }

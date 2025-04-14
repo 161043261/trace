@@ -25,7 +25,7 @@ export class Breadcrumb extends MinHeap<IBreadcrumbItem> {
     super.push(data)
   }
 
-  traceType2breadcrumbType(type: TraceType): BreadcrumbType {
+  traceType2breadcrumbType(type?: TraceType): BreadcrumbType {
     switch (type) {
       case TraceType.Xhr:
       case TraceType.Fetch:

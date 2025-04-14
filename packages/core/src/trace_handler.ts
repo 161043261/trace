@@ -1,11 +1,30 @@
 import { StatusCode, OkOrError, TraceType } from '@trace-dev/constants'
 import { IErrorData, IHttpData, IResourceError } from '@trace-dev/types'
 import { getTimestamp, statusCode2phrase, traceDev } from '@trace-dev/utils'
+import { breadcrumb } from './breadcrumb'
+import dataReporter from './data_reporter'
 
 const traceHandler = {
-  handleHttp(type: TraceType, data: IHttpData) {},
+  handleHttp(data: IHttpData) {
+    data = transformHttpData(data)
+    if (!data.url.includes(traceDev.options.dsn)) {
+      breadcrumb.push({
+        okOrError: data.okOrError,
+        timestamp: data.timestamp ?? getTimestamp(),
+        traceType: data.traceType,
+        breadcrumbType: breadcrumb.traceType2breadcrumbType(data.traceType),
+        data
+      })
+    }
 
-  handleError(type: IErrorData) {}
+    if (data.okOrError === OkOrError.Error) {
+      dataReporter.send({ ...data, type: data.traceType, okOrError: OkOrError.Error })
+    }
+  },
+
+  handleError(ev: ErrorEvent) {
+    const target = ev.target
+  }
 }
 
 function transformHttpData(data: IHttpData): IHttpData {

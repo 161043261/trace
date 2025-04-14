@@ -19,6 +19,9 @@ function replace(type: TraceType) {
       break
 
     case TraceType.Error: // Error
+      listenError()
+      break
+
     case TraceType.Fetch: // Fetch
       replaceFetch()
       break
@@ -41,10 +44,17 @@ function replace(type: TraceType) {
   }
 }
 
-export function addTraceHandler(replacer: ITraceHandler) {
-  if (!subscribeTraceHandlers(replacer)) return
-  replace(replacer.traceType)
+export function addTraceHandler(handler: ITraceHandler) {
+  if (!subscribeTraceHandlers(handler)) return
+  replace(handler.traceType)
 }
+
+// export function batchAddTraceHandlers() {
+//   addTraceHandler({
+//     traceType: TraceType.WhiteScreen,
+//     handler: () => ({})
+//   })
+// }
 
 function replaceXhr() {
   const originalXhrProto = XMLHttpRequest.prototype
@@ -78,6 +88,7 @@ function replaceXhr() {
           xhrTraceData.responseData = JSON.stringify(response)
         }
         xhrTraceData.elapsedTime = endTime - xhrTraceData.timestamp!
+        //! handleHttp(type: TraceType, data: IHttpData)
         publishTraceHandlers(TraceType.Xhr, xhrTraceData)
       })
       originalSend.apply(ctx, args)
@@ -122,6 +133,7 @@ function replaceFetch() {
               return
             }
             fetchTraceData.responseData = res
+            //! handleHttp(type: TraceType, data: IHttpData)
             publishTraceHandlers(TraceType.Fetch, fetchTraceData)
           })
           return res
@@ -192,4 +204,10 @@ function replaceHistory() {
   }
   replaceAop(globalThis.history, 'pushState', historyFnWrapper)
   replaceAop(globalThis.history, 'popState', historyFnWrapper)
+}
+
+function listenError() {
+  globalThis.addEventListener('error', (ev: ErrorEvent) => {
+    publishTraceHandlers(TraceType.Error, ev, true)
+  })
 }
