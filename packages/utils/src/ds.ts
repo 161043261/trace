@@ -43,14 +43,24 @@ export class MinHeap<T extends { timestamp: number }> {
     }
   }
 
+  getHeap() {
+    return this.itemList
+  }
+
+  clearHeap() {
+    this.itemList = []
+  }
+
   getAndClearHeap() {
     const oldMinHeap = this.itemList
     this.itemList = []
     return oldMinHeap
   }
 
-  clearHeap() {
-    this.itemList = []
+  shift() {
+    const item = this.itemList.shift()
+    this.minHeapify(0, this.itemList.length)
+    return item
   }
 }
 

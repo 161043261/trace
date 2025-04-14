@@ -1,5 +1,5 @@
 import { TraceType } from '@trace-dev/constants'
-import { IBreadcrumbData, IReportData } from './main'
+import { IBreadcrumbItem, IReportData } from './main'
 
 // traceDev 配置
 export interface ITraceOptions {
@@ -18,8 +18,8 @@ export interface ITraceOptions {
   traceScreenRecord?: boolean // 是否开启屏幕录制
   traceWhiteScreen?: boolean // 是否开启白屏检测
   // todo
-  traceImageError?: boolean // 是否上报图片错误
-  screenRecordTime?: number // 单次屏幕录制时长
+  useImageReport?: boolean // 是否上报图片错误
+  screenRecordDuration?: number // 单次屏幕录制时长
   screenRecordTraceTypeList?: TraceType[]
   hasSkeleton?: boolean // 白屏时是否有骨架屏
   // todo
@@ -28,8 +28,8 @@ export interface ITraceOptions {
   clickThrottleDelay?: number // click 点击事件的节流时长
   requestTimeout?: number // 请求的超时时长
   maxBreadcrumbs?: number // 存储用户行为的小根堆的堆容量
-  beforePushBreadcrumb?: (data: IBreadcrumbData) => IBreadcrumbData // 入堆前的 hook
-  beforeReport?: (data: IReportData) => Promise<IReportData> // 数据上报前的 hook
+  beforePushBreadcrumb?: (data: IBreadcrumbItem) => IBreadcrumbItem // 入堆前的 hook
+  beforeReportData?: (data: IReportData) => Promise<IReportData> // 数据上报前的 hook
   handleHttpResponse?: (data: unknown) => boolean // 处理 http 响应
   repeatSourceCodeError?: boolean // 是否重复上报源代码错误
 }

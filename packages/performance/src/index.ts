@@ -3,31 +3,22 @@
 // pnpm install web-vitals --filter @trace-dev/performance
 
 import { TraceType, OkOrError } from '@trace-dev/constants'
-import {
-  ILongTaskData,
-  IMemoryData,
-  IPerformanceData,
-  ISdkCore,
-  TracePlugin
-} from '@trace-dev/types'
+import { ILongTaskData, IMemoryData, IPerformanceData, TracePlugin } from '@trace-dev/types'
 import { getEntryList, getWebVitals } from './main'
-import { getTimestamp } from '@trace-dev/utils'
+import { getTimestamp, traceDev } from '@trace-dev/utils'
 
 export default class PerformancePlugin extends TracePlugin {
   constructor() {
     super(TraceType.Performance /** traceType */)
   }
-  useCore(sdkCore: ISdkCore): void {
-    const { dataReporter } = sdkCore
-
+  init(): void {
     getWebVitals((performanceData: IPerformanceData) => {
       const { name, score, poorOrGood } = performanceData
-      dataReporter.send({
+      traceDev.dataReporter.send({
         name, // IPerformanceData
         okOrError: OkOrError.Ok,
         timestamp: getTimestamp(),
         traceType: TraceType.Performance,
-
         score, // IPerformanceData
         poorOrGood // IPerformanceData
       } as IPerformanceData)
@@ -35,19 +26,18 @@ export default class PerformancePlugin extends TracePlugin {
 
     const observer = new PerformanceObserver((entryList) => {
       for (const entry of entryList.getEntries()) {
-        dataReporter.send({
+        traceDev.dataReporter.send({
           name: 'longTask',
           okOrError: OkOrError.Ok,
           timestamp: getTimestamp(),
           traceType: TraceType.Performance,
-
           longTask: entry
         } as ILongTaskData)
       }
     })
     observer.observe({ entryTypes: ['longtask'] })
     window.addEventListener('load', function () {
-      dataReporter.send({
+      traceDev.dataReporter.send({
         name: 'entryList',
         okOrError: OkOrError.Ok,
         timestamp: getTimestamp(),
@@ -57,7 +47,7 @@ export default class PerformancePlugin extends TracePlugin {
     })
 
     if (performance.memory) {
-      dataReporter.send({
+      traceDev.dataReporter.send({
         name: 'memory',
         okOrError: OkOrError.Ok,
         timestamp: getTimestamp(),

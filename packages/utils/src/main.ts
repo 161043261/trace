@@ -121,24 +121,25 @@ export function replaceAop(sourceObj: AnyObject, propKey: string, wrapper: AnyFn
   }
 }
 
-export function setTrace(
-  traceXhr = true,
-  traceFetch = true,
-  traceClick = true,
-  traceHistory = true,
-  traceError = true,
-  traceHashChange = true,
-  traceUnhandledRejection = true,
-  traceWhiteScreen = true
-) {
-  setReplaceRecord(TraceType.Xhr, traceXhr)
-  setReplaceRecord(TraceType.Fetch, traceFetch)
-  setReplaceRecord(TraceType.Click, traceClick)
-  setReplaceRecord(TraceType.History, traceHistory)
-  setReplaceRecord(TraceType.Error, traceError)
-  setReplaceRecord(TraceType.HashChange, traceHashChange)
-  setReplaceRecord(TraceType.UnhandledRejection, traceUnhandledRejection)
-  setReplaceRecord(TraceType.WhiteScreen, traceWhiteScreen)
+export function batchSetReplaceRecord() {
+  const {
+    traceXhr,
+    traceFetch,
+    traceClick,
+    traceHistory,
+    traceError,
+    traceHashChange,
+    traceUnhandledRejection,
+    traceWhiteScreen
+  } = traceDev.options
+  setReplaceRecord(TraceType.Xhr, traceXhr ?? true)
+  setReplaceRecord(TraceType.Fetch, traceFetch ?? true)
+  setReplaceRecord(TraceType.Click, traceClick ?? true)
+  setReplaceRecord(TraceType.History, traceHistory ?? true)
+  setReplaceRecord(TraceType.Error, traceError ?? true)
+  setReplaceRecord(TraceType.HashChange, traceHashChange ?? true)
+  setReplaceRecord(TraceType.UnhandledRejection, traceUnhandledRejection ?? true)
+  setReplaceRecord(TraceType.WhiteScreen, traceWhiteScreen ?? true)
 }
 
 export const throttle = (fn: AnyFn, delay: number) => {

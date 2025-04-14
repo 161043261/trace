@@ -30,7 +30,7 @@ export enum HttpPhrase {
 export enum BreadcrumbType {
   Http = 'Http',
   Click = 'Click',
-  ResourceError = 'ResourceError',
+  Resource = 'Resource',
   SourceCodeError = 'SourceCodeError',
   Route = 'Route',
   Custom = 'Custom'

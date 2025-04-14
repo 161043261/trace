@@ -1,32 +1,20 @@
 import { SDK_VERSION, TraceType } from '@trace-dev/constants'
-import {
-  IUserInfo,
-  IDataReporter,
-  IReportData,
-  IScreenRecord,
-  ITraceOptions
-} from '@trace-dev/types'
+import { IDataReporter, IReportData, IScreenRecordData, ITraceOptions } from '@trace-dev/types'
 import { generateUUID, isBrowserEnv, traceDev, VoidFnQueue } from '@trace-dev/utils'
+
+import { breadcrumb } from './main'
 
 export class DataReporter implements IDataReporter {
   queue = new VoidFnQueue() // 回调函数队列
-  projectId = traceDev.options.projectId ?? 'undefined' // 前端项目的 ID
   dsn = traceDev.options.dsn // 数据上报的地址
+  projectId = traceDev.options.projectId ?? 'undefined' // 前端项目的 ID
   userId = traceDev.options.userId ?? 'undefined' // 用户 ID
-  beforeReport = traceDev.options.beforeReport
+  useImageReport = traceDev.options.useImageReport ?? false
+  beforeReportData = traceDev.options.beforeReportData
   reportId: string
 
   constructor() {
     this.reportId = generateUUID()
-  }
-
-  // 数据上报前的 hook
-  async beforePost(data: IReportData) {
-    const reportData = this.getReportData(data)
-    if (this.beforeReport) {
-      return this.beforeReport(reportData)
-    }
-    return reportData
   }
 
   tryReportByBeacon(url: string, data: unknown): boolean {
@@ -46,18 +34,21 @@ export class DataReporter implements IDataReporter {
     this.queue.push(requestFn)
   }
 
-  getUserInfo(): IUserInfo {
-    return {
-      projectId: this.projectId,
-      sdkVersion: SDK_VERSION,
-      userId: this.userId
+  reportByImage(url: string, data: unknown) {
+    const requestFn = () => {
+      const image = new Image()
+      const sep = url.includes('?') ? '&' : '?'
+      image.src = `${url}${sep}data=${encodeURIComponent(JSON.stringify(data))}`
     }
+    this.queue.push(requestFn)
   }
 
-  getReportData(data: { type?: TraceType }): IReportData {
+  processReportData(data: IReportData): IReportData {
     const reportData: IReportData = {
       ...data,
-      ...this.getUserInfo(),
+      projectId: this.projectId,
+      sdkVersion: SDK_VERSION,
+      userId: this.userId,
       reportId: this.reportId,
       pageUrl: document.location.href,
       deviceInfo: traceDev.deviceInfo,
@@ -77,7 +68,7 @@ export class DataReporter implements IDataReporter {
   async send(data: IReportData) {
     const dsn = this.dsn
     if (dsn === '') {
-      console.error('Dsn is empty')
+      console.error('[trace-dev] DSN is empty')
       return
     }
     const options = traceDev.options as ITraceOptions
@@ -88,13 +79,18 @@ export class DataReporter implements IDataReporter {
       options.screenRecordTraceTypeList.includes(data.traceType)
     ) {
       traceDev.hasError = true
-      ;(data as IScreenRecord).screenRecordId = traceDev.screenRecordId
+      ;(data as IScreenRecordData).screenRecordId = traceDev.screenRecordId
     }
-    const reportData = await this.beforePost(data)
+    let reportData = this.processReportData(data)
+    if (this.beforeReportData) {
+      reportData = await this.beforeReportData(reportData)
+    }
     if (isBrowserEnv() && reportData) {
       const beaconOk = this.tryReportByBeacon(this.dsn, reportData)
       if (!beaconOk) {
-        return this.reportByFetch(dsn, reportData)
+        return this.useImageReport
+          ? this.reportByImage(this.dsn, reportData)
+          : this.reportByFetch(dsn, reportData)
       }
     }
   }

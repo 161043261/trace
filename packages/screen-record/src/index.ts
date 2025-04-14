@@ -3,7 +3,7 @@
 // pnpm add @trace-dev/types --filter @trace-dev/screen-record
 // pnpm install pako rrweb --filter @trace-dev/screen-record
 // pnpm install @types/pako -D --filter @trace-dev/screen-record
-import { IScreenRecordOptions, ISdkCore, TracePlugin } from '@trace-dev/types'
+import { IScreenRecordOptions, TracePlugin } from '@trace-dev/types'
 import { screenRecorder } from './main'
 import { TraceType } from '@trace-dev/constants'
 import { generateUUID, traceDev } from '@trace-dev/utils'
@@ -26,12 +26,11 @@ export default class ScreenRecordPlugin extends TracePlugin {
     }
   }
 
-  useCore(sdkCore: ISdkCore) {
-    const { dataReporter, options } = sdkCore
-    options.traceScreenRecord = true
-    options.screenRecordTraceTypeList = this.traceTypeList
+  init() {
+    traceDev.options.traceScreenRecord = true
+    traceDev.options.screenRecordTraceTypeList = this.traceTypeList
     // 初始化 screenRecordId
     traceDev.screenRecordId = generateUUID()
-    screenRecorder(dataReporter, this.duration)
+    screenRecorder(traceDev.dataReporter, this.duration)
   }
 }

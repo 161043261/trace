@@ -15,26 +15,19 @@ export interface IBaseData {
   traceType?: TraceType
 }
 
-export interface IBreadcrumbData extends IBaseData {
-  name?: string
+export interface IBreadcrumbItem {
   okOrError?: OkOrError
-  timestamp?: number
+  timestamp: number
   traceType?: TraceType
   breadcrumbType?: BreadcrumbType
+  data: unknown
 }
 
 export interface IDataReporter {
   send(data: IReportData): Promise<void>
 }
 
-//! [暂未使用] 身份验证信息
-export interface IUserInfo {
-  projectId: string
-  sdkVersion: string
-  userId?: string
-}
-
-//! [暂未使用] 用户行为
+//! [暂未使用]
 export interface IUserEventData {
   traceType: TraceType // 事件类型
   behaviorType: BreadcrumbType // 用户行为类型
@@ -54,18 +47,18 @@ export interface IDeviceInfo {
   deviceModel: string // 设备描述
 }
 
+//! [暂未使用]
 export interface IErrorData {
   localName?: string
   error?: unknown
   message: string
 }
 
-// http 请求
 export interface IHttpData extends IBaseData {
-  name?: string
-  okOrError?: OkOrError
-  timestamp?: number
-  traceType?: TraceType
+  // name?: string
+  // okOrError?: OkOrError
+  // timestamp?: number
+  // traceType?: TraceType
   method?: string
   url?: string // 接口地址
   elapsedTime?: number // 接口调用时长
@@ -82,21 +75,19 @@ export interface IHttpData extends IBaseData {
   }
 }
 
-// 长任务列表
 export interface ILongTaskData extends IBaseData {
-  name?: string
-  okOrError?: OkOrError
-  timestamp?: number
-  traceType?: TraceType
+  // name?: string
+  // okOrError?: OkOrError
+  // timestamp?: number
+  // traceType?: TraceType
   longTask?: PerformanceEntry // 长任务列表
 }
 
-// 内存信息
 export interface IMemoryData extends IBaseData {
-  name?: string
-  okOrError?: OkOrError
-  timestamp?: number
-  traceType?: TraceType
+  // name?: string
+  // okOrError?: OkOrError
+  // timestamp?: number
+  // traceType?: TraceType
   memory?: {
     jsHeapSizeLimit: number
     totalJSHeapSize: number
@@ -106,49 +97,46 @@ export interface IMemoryData extends IBaseData {
 
 export interface IReportData
   extends IHttpData,
-    IResourceError,
+    // IBreadcrumbData,
+    IResourceData,
     ILongTaskData,
     IPerformanceData,
     IMemoryData,
-    ISourceCodeError,
-    IScreenRecord {
+    ISourceCodeData,
+    IScreenRecordData {
   name?: string
   okOrError?: OkOrError // 事件状态
   timestamp?: number // 发生的时间戳
   type?: TraceType // 事件类型
-  pageUrl: string // 页面地址
-  reportId: string // 上报数据的 ID
+  pageUrl?: string // 页面地址
+  userId?: string
+  reportId?: string // 上报数据的 ID
   projectId?: string // 前端项目的 ID
   sdkVersion?: string // SDK 的版本号
-  breadcrumb?: IBreadcrumbData[]
+  breadcrumb?: IBreadcrumbItem[]
   // 设备信息
   deviceInfo?: IDeviceInfo
 }
 
-// 性能指标
-export interface IPerformanceData {
-  name?: string
-  okOrError?: OkOrError
-  timestamp?: number
-  traceType?: TraceType
-
+// TraceType.Performance 性能指标
+export interface IPerformanceData extends IBaseData {
+  // name?: string
+  // okOrError?: OkOrError
+  // timestamp?: number
+  // traceType?: TraceType
   score?: number // 分数
   poorOrGood?: 'poor' | 'good'
   entryList?: PerformanceResourceTiming[]
 }
 
-export interface IResourceData {
+export interface IResourceData extends IBaseData {
+  // name?: string
+  // okOrError?: OkOrError
+  // timestamp?: number
+  // traceType?: TraceType
   src?: string
   href?: string
   localName?: string
-}
-
-// 资源加载失败
-export interface IResourceError {
-  name?: string
-  okOrError?: OkOrError
-  timestamp?: number
-  traceType?: TraceType
   message?: string // 资源加载失败的信息
 }
 
@@ -158,28 +146,21 @@ export interface IRouteHistory {
 }
 
 // todo 屏幕录制信息
-export interface IScreenRecord extends IBaseData {
-  name?: string
-  okOrError?: OkOrError
-  timestamp?: number
-  traceType?: TraceType
+export interface IScreenRecordData extends IBaseData {
+  // name?: string
+  // okOrError?: OkOrError
+  // timestamp?: number
+  // traceType?: TraceType
   screenRecordId?: string
   recordEvents?: string
 }
 
-export interface ISdkCore {
-  dataReporter: IDataReporter // 数据上报
-  breadcrumb: unknown // 用户行为
-  options: ITraceOptions // 配置信息
-  publish: unknown // 发布消息
-}
-
 // 源代码错误
-export interface ISourceCodeError {
-  name?: string
-  okOrError?: OkOrError
-  timestamp?: number
-  traceType?: TraceType
+export interface ISourceCodeData extends IBaseData {
+  // name?: string
+  // okOrError?: OkOrError
+  // timestamp?: number
+  // traceType?: TraceType
   column?: number
   line?: number
   message?: string
@@ -210,5 +191,5 @@ export abstract class TracePlugin {
   constructor(type: TraceType) {
     this.type = type
   }
-  abstract useCore(sdkCore: ISdkCore): void
+  abstract init(): void
 }
