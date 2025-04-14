@@ -58,13 +58,12 @@ export enum TraceType {
   WhiteScreen = 'WhiteScreen'
 }
 
-// ========== 暂未使用 ==========
-
 export enum RequestType {
   Xhr = 'Xhr', // XMLHttpRequest
   Fetch = 'Fetch' // fetch
 }
 
+// ========== 暂未使用 ==========
 export enum HttpCode {
   BadRequest = 400,
   Unauthorized = 401

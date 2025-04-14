@@ -193,3 +193,8 @@ export abstract class TracePlugin {
   }
   abstract init(): void
 }
+
+export interface ITraceHandler {
+  traceType: TraceType
+  fnList: AnyFn[]
+}

@@ -3,12 +3,12 @@ import { UAParser } from 'ua-parser-js'
 import { IDeviceInfo, ITraceDev } from '@trace-dev/types'
 
 export function isBrowserEnv() {
-  return typeof window === 'object'
+  return typeof globalThis === 'object'
 }
 
 export function getTraceDev() {
-  window.__traceDev__ = window.__traceDev__ ?? ({} as ITraceDev)
-  return window.__traceDev__
+  globalThis.__traceDev__ = globalThis.__traceDev__ ?? ({} as ITraceDev)
+  return globalThis.__traceDev__
 }
 
 export const traceDev = getTraceDev() as unknown as ITraceDev
@@ -38,11 +38,11 @@ export function isReplaced(replaceType: string): boolean {
 }
 
 export function supportHistory() {
-  const chrome = window.chrome
+  const chrome = globalThis.chrome
   const isChromePackaged = chrome && chrome.app && chrome.app.runtime
   const hasHistoryApi =
-    window.history &&
-    (window.history as History).pushState &&
-    (window.history as History).replaceState
+    globalThis.history &&
+    (globalThis.history as History).pushState &&
+    (globalThis.history as History).replaceState
   return !isChromePackaged && hasHistoryApi
 }

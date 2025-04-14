@@ -12,8 +12,8 @@ interface IEntry {
 }
 let entries: IEntry[] = []
 
-const viewportWidth = window.innerWidth
-const viewportHeight = window.innerHeight
+const viewportWidth = globalThis.innerWidth
+const viewportHeight = globalThis.innerHeight
 
 function isInScreen(dom: HTMLElement): boolean {
   const domRect = dom.getBoundingClientRect()
@@ -103,7 +103,7 @@ export function getEntryList(): PerformanceResourceTiming[] {
     (entry) => !['fetch', 'xmlhttprequest', 'beacon'].includes(entry.initiatorType)
   )
   if (entryList.length > 0) {
-    // entryList = window.structuredClone(entryList)
+    // entryList = globalThis.structuredClone(entryList)
     entryList.forEach((entry) => {
       entry.fromCache = isFromCache(entry)
     })

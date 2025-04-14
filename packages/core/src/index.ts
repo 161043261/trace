@@ -32,7 +32,7 @@ export function use(Plugin: typeof PerformancePlugin | typeof ScreenRecordPlugin
   const plugin = new Plugin()
   nativeTryCatch(() => {
     plugin.init()
-  })
+  }, console.error)
 }
 
 const vuePlugin = {

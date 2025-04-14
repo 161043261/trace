@@ -1,7 +1,9 @@
+/* eslint-disable no-undef */
 // pnpm install body-parser express co-body --filter @trace-dev/server
 import express from 'express'
 import bodyParser from 'body-parser'
 import coBody from 'co-body'
+import fs from 'node:fs'
 
 const app = express()
 
@@ -31,7 +33,9 @@ app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }))
 const router = express.Router()
 
 router.post('/', async (req, res) => {
-  console.log(await coBody.json(req))
+  const body = await coBody.json(req)
+  console.log(body)
+  fs.appendFileSync('trace.log', JSON.stringify(body))
   res.end()
 })
 

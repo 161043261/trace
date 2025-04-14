@@ -38,7 +38,7 @@ export default class PerformancePlugin extends TracePlugin {
       }
     })
     observer.observe({ entryTypes: ['longtask'] })
-    window.addEventListener('load', function () {
+    globalThis.addEventListener('load', function () {
       traceDev.dataReporter.send({
         name: 'entryList',
         okOrError: OkOrError.Ok,

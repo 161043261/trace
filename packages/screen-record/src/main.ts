@@ -6,6 +6,7 @@ import { TraceType, OkOrError } from '@trace-dev/constants'
 
 export function screenRecorder(dataReporter: IDataReporter, screenRecordDuration: number) {
   const recordEventHeap = new MinHeap()
+
   record({
     emit(ev, isCheckout) {
       if (isCheckout) {

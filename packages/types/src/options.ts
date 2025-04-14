@@ -24,13 +24,13 @@ export interface ITraceOptions {
   hasSkeleton?: boolean // 白屏时是否有骨架屏
   // todo
   whiteScreenElements?: string[] // 白屏检测的元素列表
-  urlRegExp?: RegExp // 接口正则
+  ignoredUrlRegExp?: RegExp // 接口正则
   clickThrottleDelay?: number // click 点击事件的节流时长
   requestTimeout?: number // 请求的超时时长
   maxBreadcrumbs?: number // 存储用户行为的小根堆的堆容量
   beforePushBreadcrumb?: (data: IBreadcrumbItem) => IBreadcrumbItem // 入堆前的 hook
   beforeReportData?: (data: IReportData) => Promise<IReportData> // 数据上报前的 hook
-  handleHttpResponse?: (data: unknown) => boolean // 处理 http 响应
+  httpErrorCallback?: (data: unknown) => boolean // 处理 http 响应
   repeatSourceCodeError?: boolean // 是否重复上报源代码错误
 }
 

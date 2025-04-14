@@ -38,7 +38,7 @@ export class TraceOptions implements ITraceOptions {
     // urlRegExp?: RegExp
     // clickThrottleDelay?: number
     // requestTimeout?: number
-    // handleHttpResponse ?: (data: unknown) => boolean
+    // httpErrorCallback ?: (data: unknown) => boolean
   }
 
   static #traceOptions = new TraceOptions()

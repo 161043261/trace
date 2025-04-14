@@ -3,7 +3,7 @@ import { isBrowserEnv, setReplaceRecord, traceDev } from './global'
 import { TraceType, HttpPhrase } from '@trace-dev/constants'
 
 export function generateUUID(): string {
-  if (isBrowserEnv() && window.crypto) {
+  if (isBrowserEnv() && globalThis.crypto) {
     return crypto.randomUUID()
   }
   let t = new Date().getTime()
@@ -16,7 +16,7 @@ export function generateUUID(): string {
 }
 
 export function getErrorId(errStr: string): string {
-  return window.btoa(encodeURIComponent(errStr))
+  return globalThis.btoa(encodeURIComponent(errStr))
 }
 
 export function getTimestamp(): number {
@@ -131,28 +131,28 @@ export function batchSetReplaceRecord() {
     traceUnhandledRejection,
     traceWhiteScreen
   } = traceDev.options
-  setReplaceRecord(TraceType.Xhr, traceXhr ?? true)
-  setReplaceRecord(TraceType.Fetch, traceFetch ?? true)
-  setReplaceRecord(TraceType.Click, traceClick ?? true)
-  setReplaceRecord(TraceType.History, traceHistory ?? true)
-  setReplaceRecord(TraceType.Error, traceError ?? true)
-  setReplaceRecord(TraceType.HashChange, traceHashChange ?? true)
-  setReplaceRecord(TraceType.UnhandledRejection, traceUnhandledRejection ?? true)
-  setReplaceRecord(TraceType.WhiteScreen, traceWhiteScreen ?? true)
+  setReplaceRecord(TraceType.Xhr, traceXhr ?? false)
+  setReplaceRecord(TraceType.Fetch, traceFetch ?? false)
+  setReplaceRecord(TraceType.Click, traceClick ?? false)
+  setReplaceRecord(TraceType.History, traceHistory ?? false)
+  setReplaceRecord(TraceType.Error, traceError ?? false)
+  setReplaceRecord(TraceType.HashChange, traceHashChange ?? false)
+  setReplaceRecord(TraceType.UnhandledRejection, traceUnhandledRejection ?? false)
+  setReplaceRecord(TraceType.WhiteScreen, traceWhiteScreen ?? false)
 }
 
-export const throttle = (fn: AnyFn, delay: number) => {
-  let canCall = true
-  return function (ctx: unknown, ...args: unknown[]) {
-    if (!canCall) {
+export const throttle = (fn: AnyFn, delay: number, ctx?: unknown) => {
+  let canRun = true
+  return function (...args: unknown[]) {
+    if (!canRun) {
       return
     }
-    canCall = false
+    canRun = false
     fn.apply(ctx, args)
     setTimeout(() => {
-      canCall = true
+      canRun = true
     }, delay)
-  }
+  } as typeof fn
 }
 
 // > 1.toString();
