@@ -20,6 +20,7 @@ import {
   transformResourceData
 } from './main'
 import ErrorStackParser from 'error-stack-parser'
+import { checkWhiteScreen } from './white_screen'
 
 export const traceHandler = {
   handleHttp(data: IHttpData) {
@@ -153,7 +154,13 @@ export const traceHandler = {
   },
 
   handleWhiteScreen() {
-    console.log('handleWhiteScreen')
+    checkWhiteScreen((data: { okOrError: OkOrError }) => {
+      dataReporter.send({
+        traceType: TraceType.WhiteScreen,
+        timestamp: getTimestamp(),
+        ...data
+      })
+    })
   },
 
   handleClick(target: EventTarget) {

@@ -2,12 +2,11 @@ import { AnyFn } from '@trace-dev/types'
 import { traceDev } from '@trace-dev/utils'
 import { OkOrError } from '@trace-dev/constants'
 
-export function handleWhiteScreen(whiteScreenHandler: AnyFn) {
+export function checkWhiteScreen(whiteScreenHandler: AnyFn) {
   const { hasSkeleton, containerElements } = traceDev.options
-  const loopTime = 0
-  const skeletonPreList: string[] = []
-  const skeletonCurList: string[] = []
-
+  let isInitial = true
+  let currentSelectorList: string[] = []
+  const initialSelectorList: string[] = []
   const getSelector = (elem: HTMLElement) => {
     if (elem.id) {
       return '#' + elem.id
@@ -21,10 +20,10 @@ export function handleWhiteScreen(whiteScreenHandler: AnyFn) {
   const isContainer = (elem: HTMLElement) => {
     const selector = getSelector(elem)
     if (hasSkeleton) {
-      if (loopTime) {
-        skeletonCurList.push(selector)
+      if (isInitial) {
+        initialSelectorList.push(selector)
       } else {
-        skeletonPreList.push(selector)
+        currentSelectorList.push(selector)
       }
     }
     return containerElements.includes(selector)
@@ -32,6 +31,7 @@ export function handleWhiteScreen(whiteScreenHandler: AnyFn) {
 
   const screenSampling = () => {
     let emptyPoints = 0
+    // 采样
     for (let i = 1; i <= 9; i++) {
       const rowElements = document.elementsFromPoint(
         (globalThis.innerWidth * i) / 10,
@@ -45,31 +45,43 @@ export function handleWhiteScreen(whiteScreenHandler: AnyFn) {
       if (isContainer(columnElements[0] as HTMLElement)) emptyPoints++
     }
     if (emptyPoints !== 18) {
+      // 没有白屏, 停止循环
+      // 有骨架屏
       if (hasSkeleton) {
-        if (!loopTime /** loopTimes === 0 */) {
-          loopCheckWhiteScreen()
-          return
+        if (isInitial) {
+          isInitial = false
+          return loopCheckWhiteScreen()
         }
-        if (skeletonCurList.join() === skeletonPreList.join()) {
+        if (currentSelectorList.join('') === initialSelectorList.join('')) {
           return whiteScreenHandler({ okOrError: OkOrError })
         }
-        if (traceDev.whiteScreenTimer) {
-          clearTimeout(traceDev.whiteScreenTimer)
-          traceDev.whiteScreenTimer = null
-        }
+      }
+      // 没有骨架屏
+      if (traceDev.whiteScreenTimer) {
+        clearTimeout(traceDev.whiteScreenTimer)
+        traceDev.whiteScreenTimer = null
+      }
+    } else {
+      // 有白屏, 开始循环白屏检测
+      if (!traceDev.whiteScreenTimer) {
+        loopCheckWhiteScreen()
       }
     }
+    whiteScreenHandler({
+      okOrError: emptyPoints === 18 ? OkOrError.Error : OkOrError.Ok
+    })
   }
 
   const loopCheckWhiteScreen = () => {
-    console.log('traceDev.whiteScreenTimer')
     if (traceDev.whiteScreenTimer) {
       return
     }
     traceDev.whiteScreenTimer = setInterval(() => {
       if (hasSkeleton) {
+        currentSelectorList = []
       }
-    })
+      idleCallback()
+    }, 1000)
   }
 
   const idleCallback = () => {
@@ -81,11 +93,13 @@ export function handleWhiteScreen(whiteScreenHandler: AnyFn) {
   }
 
   if (hasSkeleton) {
-    if (document.readyState != 'complete') {
+    if (document.readyState !== 'complete') {
       idleCallback()
     }
   } else {
     if (document.readyState === 'complete') {
+      idleCallback()
+    } else {
       globalThis.addEventListener('load', idleCallback)
     }
   }

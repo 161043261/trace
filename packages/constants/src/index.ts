@@ -48,12 +48,10 @@ export enum TraceType {
   HashChange = 'HashChange',
   UnhandledRejection = 'UnhandledRejection',
   Resource = 'Resource',
-  Dom = 'Dom',
-  Vue = 'Vue',
-  React = 'React',
   Performance = 'Performance',
-  ScreenRecord = 'ScreenRecord', // todo
-  WhiteScreen = 'WhiteScreen'
+  ScreenRecord = 'ScreenRecord',
+  WhiteScreen = 'WhiteScreen',
+  Custom = 'Custom'
 }
 
 export enum RequestType {
