@@ -53,7 +53,7 @@ export function checkWhiteScreen(whiteScreenHandler: AnyFn) {
           return loopCheckWhiteScreen()
         }
         if (currentSelectorList.join('') === initialSelectorList.join('')) {
-          return whiteScreenHandler({ okOrError: OkOrError })
+          return whiteScreenHandler({ okOrError: OkOrError.Ok })
         }
       }
       // 没有骨架屏
