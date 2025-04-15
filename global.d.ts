@@ -1,12 +1,4 @@
-declare interface Performance {
-  memory?: {
-    jsHeapSizeLimit?: number
-    totalJSHeapSize: number
-    usedJSHeapSize: number
-  }
-}
-
-declare interface Window {
+interface Window {
   chrome: {
     app?: Record<string, unknown>
   }

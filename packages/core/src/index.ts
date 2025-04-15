@@ -1,18 +1,18 @@
 // pnpm add @trace-dev/constants --filter @trace-dev/core
 // pnpm add @trace-dev/utils --filter @trace-dev/core
 // pnpm add @trace-dev/types --filter @trace-dev/core
-
+// pnpm install error-stack-parser --filter @trace-dev/core
 import PerformancePlugin from '@trace-dev/performance'
 import ScreenRecordPlugin from '@trace-dev/screen-record'
 import { ITraceOptions } from '@trace-dev/types'
 import { nativeTryCatch } from '@trace-dev/utils'
-import { TraceOptions, dataReporter } from './main'
+import { batchAddTraceHandlers, TraceOptions } from './main'
 import { SDK_NAME, SDK_VERSION } from '@trace-dev/constants'
 
 function init(options: ITraceOptions) {
   const traceOptions = TraceOptions.traceOptions
   traceOptions.setOptions(options)
-  dataReporter.setOptions(traceOptions)
+  batchAddTraceHandlers()
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

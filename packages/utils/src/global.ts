@@ -7,8 +7,8 @@ export function isBrowserEnv() {
 }
 
 export function getTraceDev() {
-  globalThis.__traceDev__ = globalThis.__traceDev__ ?? ({} as ITraceDev)
-  return globalThis.__traceDev__
+  window.__traceDev__ = window.__traceDev__ ?? ({} as ITraceDev)
+  return window.__traceDev__
 }
 
 export const traceDev = getTraceDev() as unknown as ITraceDev
@@ -27,18 +27,9 @@ traceDev.deviceInfo = {
 
 traceDev.hasError = false
 traceDev.errorHashes = new Set<string>()
-traceDev.replacedRecord = traceDev.replacedRecord || {}
-
-export function setReplaceRecord(replaceType: string, isReplaced: boolean) {
-  traceDev.replacedRecord[replaceType] = isReplaced
-}
-
-export function isReplaced(replaceType: string): boolean {
-  return traceDev.replacedRecord[replaceType] ?? false
-}
 
 export function supportHistory() {
-  const chrome = globalThis.chrome
+  const chrome = window.chrome
   const isChromePackaged = chrome && chrome.app && chrome.app.runtime
   const hasHistoryApi =
     globalThis.history &&

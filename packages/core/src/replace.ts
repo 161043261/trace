@@ -1,62 +1,51 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { RequestMethod, RequestType, TraceType } from '@trace-dev/constants'
-import { IHttpData, ITraceHandler, VoidFn } from '@trace-dev/types'
+import { IHttpData, IRouteHistory, VoidFn } from '@trace-dev/types'
 import { getTimestamp, replaceAop, throttle, traceDev } from '@trace-dev/utils'
-import { publishTraceHandlers, subscribeTraceHandlers, dataReporter } from './main'
+import { publishTraceHandlers, dataReporter } from './main'
 
 function isIgnoredUrl(url: string) {
   return traceDev.options.ignoredUrlRegExp && traceDev.options.ignoredUrlRegExp.test(url)
 }
 
-function replace(type: TraceType) {
+export function replaceAndPublish(type: TraceType) {
   switch (type) {
     case TraceType.WhiteScreen: // WhiteScreen
-      handleWhiteScreen()
+      //! handleWhiteScreen()
+      publishTraceHandlers(TraceType.WhiteScreen)
       break
 
     case TraceType.Click: // Click
-      listenClick()
+      listenAndPublishClick()
       break
 
     case TraceType.Error: // Error
-      listenError()
+      listenAndPublishError()
       break
 
     case TraceType.Fetch: // Fetch
-      replaceFetch()
+      replaceAndPublishFetch()
       break
 
     case TraceType.HashChange: // HashChange
-      listenHashChange()
+      listenAndPublishHashChange()
       break
 
     case TraceType.History: // History
-      replaceHistory()
+      replaceAndPublishHistory()
       break
 
     case TraceType.Xhr: // Xhr
-      replaceXhr()
+      replaceAndPublishXhr()
       break
 
     case TraceType.UnhandledRejection: // UnhandledRejection
-      replaceUnhandledRejection()
+      listenAndPublishUnhandledRejection()
       break
   }
 }
 
-export function addTraceHandler(handler: ITraceHandler) {
-  if (!subscribeTraceHandlers(handler)) return
-  replace(handler.traceType)
-}
-
-// export function batchAddTraceHandlers() {
-//   addTraceHandler({
-//     traceType: TraceType.WhiteScreen,
-//     handler: () => ({})
-//   })
-// }
-
-function replaceXhr() {
+function replaceAndPublishXhr() {
   const originalXhrProto = XMLHttpRequest.prototype
   replaceAop(originalXhrProto, 'open', (originalOpen: VoidFn) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -96,7 +85,7 @@ function replaceXhr() {
   })
 }
 
-function replaceFetch() {
+function replaceAndPublishFetch() {
   replaceAop(globalThis, 'fetch', (originalFetch) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return function (url: string, options: any) {
@@ -145,6 +134,7 @@ function replaceFetch() {
           }
           fetchTraceData.elapsedTime = endTime - startTime
           fetchTraceData.statusCode = 0
+          //! handleHttp(type: TraceType, data: IHttpData)
           publishTraceHandlers(TraceType.Fetch, fetchTraceData)
           throw err
         }
@@ -153,40 +143,39 @@ function replaceFetch() {
   })
 }
 
-function listenHashChange() {
+function listenAndPublishHashChange() {
   globalThis.addEventListener('hashchange', function (ev) {
+    //! handleHashChange(ev: HashChangeEvent)
     publishTraceHandlers(TraceType.HashChange, ev)
   })
 }
 
-function replaceUnhandledRejection() {
+function listenAndPublishUnhandledRejection() {
   globalThis.addEventListener('unhandledrejection', function (ev) {
     // ev.preventDefault() // 阻止 console.error 默认行为
+    //! handleUnhandledRejection(ev: PromiseRejectionEvent)
     publishTraceHandlers(TraceType.UnhandledRejection, ev)
   })
 }
 
-function listenClick() {
+function listenAndPublishClick() {
   const throttledPublish = throttle(publishTraceHandlers, traceDev.options.clickThrottleDelay ?? 0)
-  document.addEventListener('click', function (ctx: unknown) {
-    throttledPublish(TraceType.Click, { type: 'click', data: ctx })
+  document.addEventListener('click', function (ctx) {
+    throttledPublish(TraceType.Click, ctx)
   })
-}
-
-function handleWhiteScreen() {
-  publishTraceHandlers(TraceType.WhiteScreen)
 }
 
 let lastHref = document.location.href
 
-function replaceHistory() {
+function replaceAndPublishHistory() {
   const originalOnpopstate = globalThis.onpopstate
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   globalThis.onpopstate = function (ctx: any, ...args: any) {
     const to = document.location.href
     const from = lastHref
     lastHref = to
-    publishTraceHandlers(TraceType.History, { from, to })
+    //! handleHistory(data: IRouteHistory)
+    publishTraceHandlers(TraceType.History, { from, to } as IRouteHistory)
     originalOnpopstate?.apply(ctx, args)
   }
 
@@ -197,6 +186,7 @@ function replaceHistory() {
         const from = lastHref
         const to = url
         lastHref = url
+        //! handleHistory(data: IRouteHistory)
         publishTraceHandlers(TraceType.History, { from, to })
       }
       return originalHistoryFn.apply(ctx, args)
@@ -206,8 +196,13 @@ function replaceHistory() {
   replaceAop(globalThis.history, 'popState', historyFnWrapper)
 }
 
-function listenError() {
-  globalThis.addEventListener('error', (ev: ErrorEvent) => {
-    publishTraceHandlers(TraceType.Error, ev, true)
-  })
+function listenAndPublishError() {
+  globalThis.addEventListener(
+    'error',
+    (ev: ErrorEvent) => {
+      //! handleError(ev: ErrorEvent & { target?: { localName?: string } })
+      publishTraceHandlers(TraceType.Error, ev)
+    },
+    true
+  )
 }

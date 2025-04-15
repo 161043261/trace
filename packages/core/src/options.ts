@@ -1,6 +1,7 @@
 import { TraceType } from '@trace-dev/constants'
 import { ITraceOptions } from '@trace-dev/types'
-import { batchSetReplaceRecord, traceDev } from '@trace-dev/utils'
+import { traceDev } from '@trace-dev/utils'
+import { dataReporter } from './main'
 
 export class TraceOptions implements ITraceOptions {
   dsn = ''
@@ -46,6 +47,6 @@ export class TraceOptions implements ITraceOptions {
   setOptions(options: ITraceOptions) {
     this.dsn = options.dsn
     traceDev.options = { ...this.defaultOptions, ...options }
-    batchSetReplaceRecord()
+    dataReporter.setOptions(options)
   }
 }

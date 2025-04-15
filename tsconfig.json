@@ -28,5 +28,5 @@
     "strictPropertyInitialization": true,
     "target": "ESNext"
   },
-  "include": ["trace.d.ts", "packages"]
+  "include": ["global.d.ts", "packages"]
 }

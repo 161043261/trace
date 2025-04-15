@@ -47,12 +47,6 @@ export interface IDeviceInfo {
   deviceModel: string // 设备描述
 }
 
-export interface IErrorData extends ISourceCodeError, IResourceError {
-  errorType: TraceType.Vue | TraceType.React | TraceType.Resource
-  error?: unknown
-  message: string
-}
-
 export interface IHttpData extends IBaseData {
   // name?: string
   // okOrError?: OkOrError
@@ -120,9 +114,9 @@ export interface IResourceError extends IBaseData {
   // okOrError?: OkOrError
   // timestamp?: number
   // traceType?: TraceType
+  localName?: string
   src?: string
   href?: string
-  resourceName?: string
   message?: string // 资源加载失败的信息
 }
 
@@ -167,8 +161,6 @@ export interface ITraceDev {
   whiteScreenTimer: number // 循环检测白屏使用的定时器 ID
   dataReporter: IDataReporter // 上报的数据
   options: ITraceOptions // 配置信息
-  // todo
-  replacedRecord: Record<string, boolean>
   deviceInfo: IDeviceInfo // 设备信息
 }
 
@@ -180,7 +172,7 @@ export abstract class TracePlugin {
   abstract init(): void
 }
 
-export interface ITraceHandler {
+export interface ITraceTypeAndHandler {
   traceType: TraceType
   handler: AnyFn
 }

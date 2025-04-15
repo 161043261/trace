@@ -24,6 +24,7 @@
   "dependencies": {
     "@trace-dev/constants": "workspace:^",
     "@trace-dev/types": "workspace:^",
-    "@trace-dev/utils": "workspace:^"
+    "@trace-dev/utils": "workspace:^",
+    "error-stack-parser": "^2.1.4"
   }
 }

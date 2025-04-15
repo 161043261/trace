@@ -1,6 +1,6 @@
 import { AnyObject, AnyFn, VoidFn } from '@trace-dev/types' // monorepo
-import { isBrowserEnv, setReplaceRecord, traceDev } from './global'
-import { TraceType, StatusPhrase } from '@trace-dev/constants'
+import { isBrowserEnv, traceDev } from './global'
+import { StatusPhrase } from '@trace-dev/constants'
 
 export function generateUUID(): string {
   if (isBrowserEnv() && globalThis.crypto) {
@@ -15,8 +15,8 @@ export function generateUUID(): string {
   })
 }
 
-export function getErrorId(errStr: string): string {
-  return globalThis.btoa(encodeURIComponent(errStr))
+export function getErrorId(errorStr: string): string {
+  return globalThis.btoa(encodeURIComponent(errorStr))
 }
 
 export function getTimestamp(): number {
@@ -34,15 +34,17 @@ export function getYmd(): string {
   return `${year}-${pad0(mouth)}-${pad0(date)}`
 }
 
-export function hasErrorHash(hash: string): boolean {
-  const hasHash = traceDev.errorHashes.has(hash)
-  if (!hasHash) traceDev.errorHashes.add(hash)
+export function hasErrorHash(errorHash: string): boolean {
+  const hasHash = traceDev.errorHashes.has(errorHash)
+  // todo
+  if (traceDev.errorHashes.size > 20) traceDev.errorHashes.clear()
+  if (!hasHash) traceDev.errorHashes.add(errorHash)
   return hasHash
 }
 
 export function htmlElem2str(elem: HTMLElement): string {
   const tagName = elem.tagName.toLowerCase()
-  if (tagName === 'body' || tagName === 'html') return ''
+  if (!tagName || tagName === 'body' || tagName === 'html') return ''
   const idStr = elem.id ? ` id=${elem.id}` : ''
   let classNames = elem.classList.value
   if (classNames !== '') classNames = ` class=${classNames}`
@@ -118,27 +120,6 @@ export function replaceAop(sourceObj: AnyObject, propKey: string, wrapper: AnyFn
       sourceObj[propKey] = wrappedFn
     }
   }
-}
-
-export function batchSetReplaceRecord() {
-  const {
-    traceXhr,
-    traceFetch,
-    traceClick,
-    traceHistory,
-    traceError,
-    traceHashChange,
-    traceUnhandledRejection,
-    traceWhiteScreen
-  } = traceDev.options
-  setReplaceRecord(TraceType.Xhr, traceXhr ?? false)
-  setReplaceRecord(TraceType.Fetch, traceFetch ?? false)
-  setReplaceRecord(TraceType.Click, traceClick ?? false)
-  setReplaceRecord(TraceType.History, traceHistory ?? false)
-  setReplaceRecord(TraceType.Error, traceError ?? false)
-  setReplaceRecord(TraceType.HashChange, traceHashChange ?? false)
-  setReplaceRecord(TraceType.UnhandledRejection, traceUnhandledRejection ?? false)
-  setReplaceRecord(TraceType.WhiteScreen, traceWhiteScreen ?? false)
 }
 
 export const throttle = (fn: AnyFn, delay: number, ctx?: unknown) => {
