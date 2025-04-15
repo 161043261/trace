@@ -4,14 +4,13 @@ import { IDataReporter, IScreenRecordData } from '@trace-dev/types'
 import { generateUUID, getTimestamp, MinHeap, traceDev } from '@trace-dev/utils'
 import { TraceType, OkOrError } from '@trace-dev/constants'
 
-export function screenRecorder(dataReporter: IDataReporter, screenRecordEveryNms: number) {
+export function screenRecorder(screenRecordEveryNms: number, dataReporter?: IDataReporter) {
   const recordEventHeap = new MinHeap()
-
   record({
     emit(ev, isCheckout) {
       if (isCheckout) {
         if (traceDev.hasError) {
-          dataReporter.send({
+          dataReporter?.send({
             name: 'screenRecord',
             okOrError: OkOrError.Error,
             timestamp: getTimestamp(),

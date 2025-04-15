@@ -117,7 +117,7 @@ export interface ITraceDev {
   hasError: boolean // 某个时间段, 代码是否报错
   errorHashes: Set<string> // 源代码错误的 hash 值的集合
   whiteScreenTimer: number | null // 循环检测白屏使用的定时器 ID
-  dataReporter: IDataReporter // 上报的数据
+  dataReporter?: IDataReporter // 上报的数据
   options: ITraceOptions // 配置信息
   deviceInfo: IDeviceInfo // 设备信息
 }

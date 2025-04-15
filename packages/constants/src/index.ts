@@ -1,3 +1,4 @@
+import { ITraceOptions } from '@trace-dev/types'
 import packageJson from '../../../package.json'
 
 export const SDK_NAME = packageJson.name
@@ -75,4 +76,37 @@ export enum RequestMethod {
   Connect = 'CONNECT',
   Head = 'HEAD',
   Trace = 'TRACE'
+}
+
+export const defaultOptions: ITraceOptions = {
+  dsn: '',
+  projectId: 'unknown',
+  disabled: false,
+  userId: 'unknown',
+  traceXhr: true,
+  traceFetch: true,
+  traceClick: true,
+  traceError: true,
+  traceUnhandledRejection: true,
+  traceHashChange: true,
+  traceHistory: true,
+  tracePerformance: true,
+  traceScreenRecord: true,
+  traceWhiteScreen: true,
+  useImageReport: true,
+  screenRecordEveryNms: 3000,
+  screenRecordTraceTypeList: [
+    TraceType.Error,
+    TraceType.UnhandledRejection,
+    TraceType.Resource,
+    TraceType.Fetch,
+    TraceType.Xhr
+  ],
+  hasSkeleton: false,
+  containerElements: ['html', 'body', '#app', '#root'],
+  // ignoredUrlRegExp?: RegExp // 接口正则
+  clickThrottleDelay: 0,
+  requestTimeoutNms: 3000, // 单位 ms
+  maxBreadcrumbs: 20,
+  repeatSourceCodeError: false
 }

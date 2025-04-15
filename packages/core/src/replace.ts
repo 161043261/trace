@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-this-alias */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { OkOrError, RequestMethod, RequestType, TraceType } from '@trace-dev/constants'
 import { IHttpData, VoidFn } from '@trace-dev/types'
 import { getTimestamp, replaceAop, supportHistory, throttle, traceDev } from '@trace-dev/utils'
@@ -50,66 +46,54 @@ export function replaceAndPublish(type: TraceType) {
 
 function replaceAndPublishXhr() {
   const originalXhrProto = XMLHttpRequest.prototype
-  let ctx: any
   replaceAop(originalXhrProto, 'open', (originalOpen: VoidFn) => {
-    return function (...args: any[]) {
-      // @ts-ignore
-      ctx = this
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return function (this: any, ...args: string[]) {
+      console.log('[debug]', this)
       const xhrTraceData: IHttpData = {
-        //! 1. okOrError: OkOrError
         okOrError: OkOrError.Ok,
-        //! 2. timestamp: number
         timestamp: getTimestamp(),
-        //! 3. traceType: TraceType
         traceType: TraceType.Xhr,
-        //! 4. method: string
-        method: typeof args[0] === 'string' ? args[0].toUpperCase() : args[0],
-        //! 5. url: string
+        method: args[0].toUpperCase(),
         url: args[1],
-        //! 6. elapsedTime: number
         elapsedTime: 0,
-        //! 7. message: string
         message: '',
-        //! 8. statusCode: number
         statusCode: 0,
-        //! 9. requestType: RequestType
         requestType: RequestType.Xhr
       }
-      ctx.xhrTraceData = xhrTraceData
-      originalOpen.apply(ctx, args)
+      this.xhrTraceData = xhrTraceData
+      originalOpen.apply(this, args)
     }
   })
 
   replaceAop(originalXhrProto, 'send', (originalSend: VoidFn) => {
-    return function (...args: any[]) {
-      // @ts-ignore
-      console.log('ctx === this', ctx === this)
-      const { method, url } = ctx.xhrTraceData
-      // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return function (this: any, ...args: unknown[]) {
+      console.log('[debug]', this)
+      const { method, url } = this.xhrTraceData
       this.addEventListener('loadend', () => {
-        if ((method === RequestMethod.Post && dataReporter.isSdkDsn(url!)) || isIgnoredUrl(url!)) {
+        if ((method === RequestMethod.Post && dataReporter.isSdkDsn(url)) || isIgnoredUrl(url)) {
           return
         }
-        // @ts-ignore
         const { responseType, response, status } = this
-        ctx.xhrTraceData.requestData = args[0]
+        this.xhrTraceData.requestData = args[0]
         const endTime = getTimestamp()
-        ctx.xhrTraceData.statusCode = Number.parseInt(status)
+        this.xhrTraceData.statusCode = Number.parseInt(status)
         if (['', 'json', 'text'].includes(responseType)) {
-          ctx.xhrTraceData.responseData = JSON.stringify(response)
+          this.xhrTraceData.responseData = JSON.stringify(response)
         }
-        ctx.xhrTraceData.elapsedTime = endTime - ctx.xhrTraceData.timestamp!
+        this.xhrTraceData.elapsedTime = endTime - this.xhrTraceData.timestamp
         //! handleHttp(type: TraceType, data: IHttpData)
-        publishTraceHandlers(TraceType.Xhr, ctx.xhrTraceData)
+        publishTraceHandlers(TraceType.Xhr, this.xhrTraceData)
       })
-      originalSend.apply(ctx, args)
+      originalSend.apply(this, args)
     }
   })
 }
 
 function replaceAndPublishFetch() {
   replaceAop(globalThis, 'fetch', (originalFetch) => {
-    return function (url: string, options: any) {
+    return function (url: string, options: RequestInit) {
       const startTime = getTimestamp()
       const method = options?.method ?? 'GET'
       const fetchTraceData: IHttpData = {
@@ -130,7 +114,7 @@ function replaceAndPublishFetch() {
       // 使用解构赋值
       options = { ...options, ...headers }
       return originalFetch.apply(globalThis, [url, options]).then(
-        (res: any) => {
+        (res: Response) => {
           // res.clone() 克隆响应, 防止响应被标记为已消费
           const resClone = res.clone()
           const endTime = getTimestamp()
@@ -190,15 +174,15 @@ function listenAndPublishClick() {
 let lastHref = document.location.href
 
 function replaceAndPublishHistory() {
-  if (!supportHistory()) return
   const originalOnpopstate = globalThis.onpopstate
-  globalThis.onpopstate = function (ctx: any, ...args: any) {
+  if (!supportHistory() || !originalOnpopstate) return
+  globalThis.onpopstate = function (this: Window, ev: PopStateEvent) {
     const to = document.location.href
     const from = lastHref
     lastHref = to
     //! handleHistory(data: IRouteHistory)
     publishTraceHandlers(TraceType.History, { from, to })
-    originalOnpopstate?.apply(ctx, args)
+    originalOnpopstate.call(this, ev)
   }
 
   const historyFnWrapper = (originalHistoryFn: VoidFn): VoidFn => {

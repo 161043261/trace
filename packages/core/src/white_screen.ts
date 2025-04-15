@@ -1,13 +1,10 @@
 import { AnyFn } from '@trace-dev/types'
 import { traceDev } from '@trace-dev/utils'
-import { OkOrError } from 'packages/constants/dist/index.cjs'
+import { OkOrError } from '@trace-dev/constants'
 
 export function handleWhiteScreen(whiteScreenHandler: AnyFn) {
-  const {
-    hasSkeleton,
-    containerElements: whiteScreenElements = ['html', 'body', '#app', '#root']
-  } = traceDev.options
-  let loopTime: number = 0
+  const { hasSkeleton, containerElements } = traceDev.options
+  const loopTime = 0
   const skeletonPreList: string[] = []
   const skeletonCurList: string[] = []
 
@@ -23,7 +20,6 @@ export function handleWhiteScreen(whiteScreenHandler: AnyFn) {
 
   const isContainer = (elem: HTMLElement) => {
     const selector = getSelector(elem)
-
     if (hasSkeleton) {
       if (loopTime) {
         skeletonCurList.push(selector)
@@ -31,7 +27,7 @@ export function handleWhiteScreen(whiteScreenHandler: AnyFn) {
         skeletonPreList.push(selector)
       }
     }
-    return whiteScreenElements.includes(selector)
+    return containerElements.includes(selector)
   }
 
   const screenSampling = () => {
@@ -66,6 +62,7 @@ export function handleWhiteScreen(whiteScreenHandler: AnyFn) {
   }
 
   const loopCheckWhiteScreen = () => {
+    console.log('traceDev.whiteScreenTimer')
     if (traceDev.whiteScreenTimer) {
       return
     }

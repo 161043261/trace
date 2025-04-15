@@ -15,7 +15,7 @@ export default class PerformancePlugin extends TracePlugin {
   init(): void {
     getWebVitals((performanceData: IPerformanceData) => {
       const { name, score, poorOrGood } = performanceData
-      traceDev.dataReporter.send({
+      traceDev.dataReporter?.send({
         name, // IPerformanceData
         okOrError: OkOrError.Ok,
         timestamp: getTimestamp(),
@@ -27,7 +27,7 @@ export default class PerformancePlugin extends TracePlugin {
 
     const observer = new PerformanceObserver((entryList) => {
       for (const entry of entryList.getEntries()) {
-        traceDev.dataReporter.send({
+        traceDev.dataReporter?.send({
           name: 'longTask',
           okOrError: OkOrError.Ok,
           timestamp: getTimestamp(),
@@ -39,7 +39,7 @@ export default class PerformancePlugin extends TracePlugin {
 
     observer.observe({ entryTypes: ['longtask'] })
     globalThis.addEventListener('load', function () {
-      traceDev.dataReporter.send({
+      traceDev.dataReporter?.send({
         name: 'resourceList',
         okOrError: OkOrError.Ok,
         timestamp: getTimestamp(),
@@ -49,7 +49,7 @@ export default class PerformancePlugin extends TracePlugin {
     })
 
     if (performance.memory) {
-      traceDev.dataReporter.send({
+      traceDev.dataReporter?.send({
         name: 'memory',
         okOrError: OkOrError.Ok,
         timestamp: getTimestamp(),

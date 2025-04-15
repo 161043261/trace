@@ -121,7 +121,7 @@ export class DataReporter implements IDataReporter {
       console.error('[trace-dev] DSN is empty')
       return
     }
-    const options = traceDev.options as ITraceOptions
+    const options = traceDev.options
     if (options.screenRecordTraceTypeList.includes(data.traceType)) {
       traceDev.hasError = true
     }

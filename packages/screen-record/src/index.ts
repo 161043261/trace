@@ -29,6 +29,6 @@ export default class ScreenRecordPlugin extends TracePlugin {
   init() {
     traceDev.options.traceScreenRecord = true
     traceDev.options.screenRecordTraceTypeList = this.traceTypeList
-    screenRecorder(traceDev.dataReporter, this.everyNms)
+    screenRecorder(this.everyNms, traceDev.dataReporter)
   }
 }

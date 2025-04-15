@@ -134,7 +134,7 @@ export const throttle = (fn: AnyFn, delay: number, ctx?: unknown) => {
     setTimeout(() => {
       canRun = true
     }, delay)
-  } as typeof fn
+  }
 }
 
 export function unknown2str(target: unknown): string {

@@ -1,4 +1,4 @@
-interface Window {
+declare interface Window {
   chrome: {
     app?: Record<string, unknown>
   }
@@ -6,9 +6,7 @@ interface Window {
     hasError: boolean // 某个时间段, 是否发生错误
     errorHashes: Set<string> // 源代码错误的 hash 值的集合
     whiteScreenTimer: number | null // 循环检测白屏使用的定时器 ID
-    reportData: unknown // 上报的数据
     options: unknown // 配置信息
-    replacedRecord: unknown
     deviceInfo: unknown
   }
 }

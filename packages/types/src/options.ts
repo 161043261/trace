@@ -22,11 +22,11 @@ export interface ITraceOptions {
   screenRecordTraceTypeList: TraceType[]
   hasSkeleton: boolean // 白屏时是否有骨架屏
   containerElements: string[]
-  ignoredUrlRegExp?: RegExp // 接口正则
   clickThrottleDelay: number // click 点击事件的节流时长
   requestTimeoutNms: number // 请求的超时时长
   maxBreadcrumbs: number // 存储用户行为的小根堆的堆容量
   repeatSourceCodeError: boolean // 是否重复上报源代码错误
+  ignoredUrlRegExp?: RegExp // 接口正则
   beforePushBreadcrumb?: (data: IBreadcrumbItem) => IBreadcrumbItem // 入堆前的 hook
   beforeReportData?: (data: IReportData) => Promise<IReportData> // 数据上报前的 hook
   httpErrorHandler?: (data: unknown) => boolean // 处理 http 错误的回调函数
