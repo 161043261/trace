@@ -10,21 +10,32 @@ export type AnyObject = Record<number | string | symbol, any>
 
 export interface IBaseData {
   name?: string
-  okOrError?: OkOrError
-  timestamp?: number
-  traceType?: TraceType
+  okOrError: OkOrError
+  timestamp: number
+  traceType: TraceType
 }
 
 export interface IBreadcrumbItem {
-  okOrError?: OkOrError
+  okOrError: OkOrError
   timestamp: number
-  traceType?: TraceType
-  breadcrumbType?: BreadcrumbType
+  traceType: TraceType
+  breadcrumbType: BreadcrumbType
   data: unknown
 }
 
 export interface IDataReporter {
-  send(data: IReportData): Promise<void>
+  send(
+    data:
+      | IReportData
+      | IBaseData
+      | IHttpData
+      | ILongTaskData
+      | IReportData
+      | IPerformanceData
+      | IResourceError
+      | IScreenRecordData
+      | ISourceCodeError
+  ): Promise<void>
 }
 
 export interface IDeviceInfo {
@@ -38,14 +49,10 @@ export interface IDeviceInfo {
 }
 
 export interface IHttpData extends IBaseData {
-  // name?: string
-  // okOrError?: OkOrError
-  // timestamp?: number
-  // traceType?: TraceType
   method: string
   url: string // 接口地址
   elapsedTime: number // 接口调用时长
-  message?: string // 接口信息
+  message: string // 接口信息
   statusCode: number // http 状态码
   requestType: RequestType // 请求类型: xhr 或 fetch
   requestData?: unknown
@@ -53,19 +60,11 @@ export interface IHttpData extends IBaseData {
 }
 
 export interface ILongTaskData extends IBaseData {
-  // name?: string
-  // okOrError?: OkOrError
-  // timestamp?: number
-  // traceType?: TraceType
-  longTask?: PerformanceEntry // 长任务列表
+  longTask: PerformanceEntry // 长任务列表
 }
 
 export interface IMemoryData extends IBaseData {
-  // name?: string
-  // okOrError?: OkOrError
-  // timestamp?: number
-  // traceType?: TraceType
-  memory?: {
+  memory: {
     jsHeapSizeLimit: number
     totalJSHeapSize: number
     usedJSHeapSize: number
@@ -73,78 +72,51 @@ export interface IMemoryData extends IBaseData {
 }
 
 export interface IReportData extends IBaseData {
-  name?: string
-  okOrError?: OkOrError // 事件状态
-  timestamp?: number // 发生的时间戳
-  type?: TraceType // 事件类型
-  pageUrl?: string // 页面地址
-  userId?: string
-  reportId?: string // 上报数据的 ID
-  projectId?: string // 前端项目的 ID
-  sdkVersion?: string // SDK 的版本号
-  breadcrumb?: IBreadcrumbItem[]
+  pageUrl: string // 页面地址
+  userId: string
+  reportId: string // 上报数据的 ID
+  projectId: string // 前端项目的 ID
+  sdkVersion: string // SDK 的版本号
+  breadcrumb: IBreadcrumbItem[]
   // 设备信息
-  deviceInfo?: IDeviceInfo
+  deviceInfo: IDeviceInfo
   data?: unknown
 }
 
 // TraceType.Performance 性能指标
 export interface IPerformanceData extends IBaseData {
-  // name?: string
-  // okOrError?: OkOrError
-  // timestamp?: number
-  // traceType?: TraceType
-  score?: number // 分数
-  poorOrGood?: 'poor' | 'good'
+  score: number // 分数
+  poorOrGood: 'poor' | 'good'
   resourceList?: PerformanceResourceTiming[]
 }
 
 // 资源加载错误
 export interface IResourceError extends IBaseData {
-  // name?: string
-  // okOrError?: OkOrError
-  // timestamp?: number
-  // traceType?: TraceType
-  localName?: string
-  src?: string
-  href?: string
-  message?: string // 资源加载失败的信息
-}
-
-export interface IRouteHistory {
-  from: string
-  to: string
+  localName: string
+  src: string
+  href: string
+  message: string // 资源加载失败的信息
 }
 
 // 屏幕录制信息
 export interface IScreenRecordData extends IBaseData {
-  // name?: string
-  // okOrError?: OkOrError
-  // timestamp?: number
-  // traceType?: TraceType
-  screenRecordId?: string
-  recordEvents?: string
+  recordId: string
+  recordEvents: string
 }
 
 // 源代码错误
 export interface ISourceCodeError extends IBaseData {
-  // name?: string
-  // okOrError?: OkOrError
-  // timestamp?: number
-  // traceType?: TraceType
-  column?: number
-  line?: number
-  message?: string
-  filename?: string // 报错的文件名
+  column: number
+  line: number
+  message: string
+  filename: string // 报错的文件名
 }
 
 // 参考 trace.d.ts
 export interface ITraceDev {
   hasError: boolean // 某个时间段, 代码是否报错
   errorHashes: Set<string> // 源代码错误的 hash 值的集合
-  screenRecordEvents: string[] // 屏幕录制信息
-  screenRecordId: string // 屏幕录制 ID
-  whiteScreenTimer: number // 循环检测白屏使用的定时器 ID
+  whiteScreenTimer: number | null // 循环检测白屏使用的定时器 ID
   dataReporter: IDataReporter // 上报的数据
   options: ITraceOptions // 配置信息
   deviceInfo: IDeviceInfo // 设备信息

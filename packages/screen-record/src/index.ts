@@ -6,10 +6,10 @@
 import { TracePlugin } from '@trace-dev/types'
 import { screenRecorder } from './main'
 import { TraceType } from '@trace-dev/constants'
-import { generateUUID, traceDev } from '@trace-dev/utils'
+import { traceDev } from '@trace-dev/utils'
 
 export default class ScreenRecordPlugin extends TracePlugin {
-  duration = 10 // 默认屏幕录制时长
+  everyNms = 3000 // 默认屏幕录制时长
   traceTypeList: TraceType[] = [
     TraceType.Error,
     TraceType.UnhandledRejection,
@@ -17,11 +17,11 @@ export default class ScreenRecordPlugin extends TracePlugin {
     TraceType.Fetch,
     TraceType.Xhr
   ]
-  constructor(options?: { traceTypeList: TraceType[]; duration: number }) {
+  constructor(options?: { traceTypeList: TraceType[]; everyNms: number }) {
     super(TraceType.ScreenRecord /** traceType */)
     this.type = TraceType.ScreenRecord
     if (options) {
-      this.duration = options.duration
+      this.everyNms = options.everyNms
       this.traceTypeList = options.traceTypeList
     }
   }
@@ -29,8 +29,6 @@ export default class ScreenRecordPlugin extends TracePlugin {
   init() {
     traceDev.options.traceScreenRecord = true
     traceDev.options.screenRecordTraceTypeList = this.traceTypeList
-    // 初始化 screenRecordId
-    traceDev.screenRecordId = generateUUID()
-    screenRecorder(traceDev.dataReporter, this.duration)
+    screenRecorder(traceDev.dataReporter, this.everyNms)
   }
 }

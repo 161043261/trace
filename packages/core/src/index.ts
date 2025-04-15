@@ -6,12 +6,12 @@ import PerformancePlugin from '@trace-dev/performance'
 import ScreenRecordPlugin from '@trace-dev/screen-record'
 import { ITraceOptions } from '@trace-dev/types'
 import { nativeTryCatch } from '@trace-dev/utils'
-import { batchAddTraceHandlers, TraceOptions } from './main'
+import { batchAddTraceHandlers, OptionsHelper } from './main'
 import { SDK_NAME, SDK_VERSION } from '@trace-dev/constants'
 
 function init(options: ITraceOptions) {
-  const traceOptions = TraceOptions.traceOptions
-  traceOptions.setOptions(options)
+  const optionsHelper = OptionsHelper.optionsHelper
+  optionsHelper.setOptions(options)
   batchAddTraceHandlers()
 }
 

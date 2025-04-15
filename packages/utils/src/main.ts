@@ -44,7 +44,7 @@ export function hasErrorHash(errorHash: string): boolean {
 }
 
 export function htmlElem2str(elem: HTMLElement): string {
-  const tagName = elem.tagName.toLowerCase()
+  const tagName = elem.tagName?.toLowerCase()
   if (!tagName || tagName === 'body' || tagName === 'html') return ''
   const idStr = elem.id ? ` id=${elem.id}` : ''
   let classNames = elem.classList.value

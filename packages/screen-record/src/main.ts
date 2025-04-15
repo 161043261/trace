@@ -4,33 +4,30 @@ import { IDataReporter, IScreenRecordData } from '@trace-dev/types'
 import { generateUUID, getTimestamp, MinHeap, traceDev } from '@trace-dev/utils'
 import { TraceType, OkOrError } from '@trace-dev/constants'
 
-export function screenRecorder(dataReporter: IDataReporter, screenRecordDuration: number) {
+export function screenRecorder(dataReporter: IDataReporter, screenRecordEveryNms: number) {
   const recordEventHeap = new MinHeap()
 
   record({
     emit(ev, isCheckout) {
       if (isCheckout) {
         if (traceDev.hasError) {
-          const screenRecordId = traceDev.screenRecordId
-          traceDev.screenRecordId = generateUUID()
           dataReporter.send({
             name: 'screenRecord',
             okOrError: OkOrError.Error,
             timestamp: getTimestamp(),
             traceType: TraceType.ScreenRecord,
-            screenRecordId: screenRecordId,
+            recordId: generateUUID(),
             recordEvents: compress(recordEventHeap.getAndClearHeap())
           } as IScreenRecordData)
           traceDev.hasError = false
         } else {
-          traceDev.screenRecordId = generateUUID()
           recordEventHeap.clearHeap()
         }
       }
       recordEventHeap.push(ev)
     },
     recordCanvas: true,
-    checkoutEveryNms: 1000 * screenRecordDuration
+    checkoutEveryNms: screenRecordEveryNms
   })
 }
 

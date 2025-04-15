@@ -3,13 +3,14 @@ import { ITraceOptions } from '@trace-dev/types'
 import { traceDev } from '@trace-dev/utils'
 import { dataReporter } from './main'
 
-export class TraceOptions implements ITraceOptions {
+export class OptionsHelper {
   dsn = ''
-  defaultOptions = {
+
+  defaultOptions: ITraceOptions = {
     dsn: '',
-    projectId: 'undefined',
+    projectId: 'unknown',
     disabled: false,
-    userId: 'undefined',
+    userId: 'unknown',
     traceXhr: true,
     traceFetch: true,
     traceClick: true,
@@ -21,7 +22,7 @@ export class TraceOptions implements ITraceOptions {
     traceScreenRecord: true,
     traceWhiteScreen: true,
     useImageReport: true,
-    screenRecordDuration: 10,
+    screenRecordEveryNms: 3000,
     screenRecordTraceTypeList: [
       TraceType.Error,
       TraceType.UnhandledRejection,
@@ -30,18 +31,18 @@ export class TraceOptions implements ITraceOptions {
       TraceType.Xhr
     ],
     hasSkeleton: false,
-    whiteScreenElements: ['html', 'body', '#app', '#root'],
+    containerElements: ['html', 'body', '#app', '#root'],
     // ignoredUrlRegExp?: RegExp // 接口正则
     clickThrottleDelay: 0,
-    requestTimeout: 10, // 单位 s
+    requestTimeoutNms: 3000, // 单位 ms
     maxBreadcrumbs: 20,
     repeatSourceCodeError: false
   }
 
-  static #traceOptions = new TraceOptions()
+  static #optionsHelper = new OptionsHelper()
 
-  public static get traceOptions() {
-    return this.#traceOptions
+  public static get optionsHelper() {
+    return this.#optionsHelper
   }
 
   setOptions(options: ITraceOptions) {

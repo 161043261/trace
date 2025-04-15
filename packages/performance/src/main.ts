@@ -1,4 +1,6 @@
+import { OkOrError, TraceType } from '@trace-dev/constants'
 import { AnyFn, IPerformanceData } from '@trace-dev/types'
+import { getTimestamp } from '@trace-dev/utils'
 import { onFCP, onLCP, onCLS, onINP, onTTFB } from 'web-vitals'
 // 首屏加载时间
 let firstScreenPaint = 0
@@ -172,8 +174,12 @@ export function getWebVitals(dataReporter: AnyFn): void {
       dataReporter(data)
     })
   }
+
   getFSP((value) => {
     const data: IPerformanceData = {
+      okOrError: OkOrError.Ok,
+      timestamp: getTimestamp(),
+      traceType: TraceType.Performance,
       name: 'FSP',
       score: value,
       poorOrGood: value > 2500 ? 'poor' : 'good'

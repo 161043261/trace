@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { RequestMethod, RequestType, TraceType } from '@trace-dev/constants'
-import { IHttpData, IRouteHistory, VoidFn } from '@trace-dev/types'
+import { OkOrError, RequestMethod, RequestType, TraceType } from '@trace-dev/constants'
+import { IHttpData, VoidFn } from '@trace-dev/types'
 import { getTimestamp, replaceAop, supportHistory, throttle, traceDev } from '@trace-dev/utils'
 import { publishTraceHandlers, dataReporter } from './main'
 
@@ -47,38 +50,57 @@ export function replaceAndPublish(type: TraceType) {
 
 function replaceAndPublishXhr() {
   const originalXhrProto = XMLHttpRequest.prototype
+  let ctx: any
   replaceAop(originalXhrProto, 'open', (originalOpen: VoidFn) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return function (ctx: any, ...args: any[]) {
-      ctx.xhrTraceData = {
-        method: typeof args[0] === 'string' ? args[0].toUpperCase() : args[0],
-        url: args[1],
+    return function (...args: any[]) {
+      // @ts-ignore
+      ctx = this
+      const xhrTraceData: IHttpData = {
+        //! 1. okOrError: OkOrError
+        okOrError: OkOrError.Ok,
+        //! 2. timestamp: number
         timestamp: getTimestamp(),
+        //! 3. traceType: TraceType
+        traceType: TraceType.Xhr,
+        //! 4. method: string
+        method: typeof args[0] === 'string' ? args[0].toUpperCase() : args[0],
+        //! 5. url: string
+        url: args[1],
+        //! 6. elapsedTime: number
+        elapsedTime: 0,
+        //! 7. message: string
+        message: '',
+        //! 8. statusCode: number
+        statusCode: 0,
+        //! 9. requestType: RequestType
         requestType: RequestType.Xhr
-      } as IHttpData
+      }
+      ctx.xhrTraceData = xhrTraceData
       originalOpen.apply(ctx, args)
     }
   })
 
   replaceAop(originalXhrProto, 'send', (originalSend: VoidFn) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return function (ctx: any, ...args: any) {
-      const xhrTraceData = ctx.xhrTraceData as IHttpData
-      const { method, url } = xhrTraceData
-      ctx.addEventListener('loadend', () => {
+    return function (...args: any[]) {
+      // @ts-ignore
+      console.log('ctx === this', ctx === this)
+      const { method, url } = ctx.xhrTraceData
+      // @ts-ignore
+      this.addEventListener('loadend', () => {
         if ((method === RequestMethod.Post && dataReporter.isSdkDsn(url!)) || isIgnoredUrl(url!)) {
           return
         }
-        const { responseType, response, status } = ctx
-        xhrTraceData.requestData = args[0]
+        // @ts-ignore
+        const { responseType, response, status } = this
+        ctx.xhrTraceData.requestData = args[0]
         const endTime = getTimestamp()
-        xhrTraceData.statusCode = Number.parseInt(status)
+        ctx.xhrTraceData.statusCode = Number.parseInt(status)
         if (['', 'json', 'text'].includes(responseType)) {
-          xhrTraceData.responseData = JSON.stringify(response)
+          ctx.xhrTraceData.responseData = JSON.stringify(response)
         }
-        xhrTraceData.elapsedTime = endTime - xhrTraceData.timestamp!
+        ctx.xhrTraceData.elapsedTime = endTime - ctx.xhrTraceData.timestamp!
         //! handleHttp(type: TraceType, data: IHttpData)
-        publishTraceHandlers(TraceType.Xhr, xhrTraceData)
+        publishTraceHandlers(TraceType.Xhr, ctx.xhrTraceData)
       })
       originalSend.apply(ctx, args)
     }
@@ -87,7 +109,6 @@ function replaceAndPublishXhr() {
 
 function replaceAndPublishFetch() {
   replaceAop(globalThis, 'fetch', (originalFetch) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return function (url: string, options: any) {
       const startTime = getTimestamp()
       const method = options?.method ?? 'GET'
@@ -97,9 +118,11 @@ function replaceAndPublishFetch() {
         method,
         requestData: options && options.body,
         url,
-        responseData: '',
         elapsedTime: 0,
-        statusCode: 0
+        statusCode: 0,
+        message: '',
+        okOrError: OkOrError.Ok,
+        traceType: TraceType.Fetch
       }
       const headers = new Headers(options.headers ?? {})
       // 使用 Object.assign
@@ -107,7 +130,6 @@ function replaceAndPublishFetch() {
       // 使用解构赋值
       options = { ...options, ...headers }
       return originalFetch.apply(globalThis, [url, options]).then(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (res: any) => {
           // res.clone() 克隆响应, 防止响应被标记为已消费
           const resClone = res.clone()
@@ -170,13 +192,12 @@ let lastHref = document.location.href
 function replaceAndPublishHistory() {
   if (!supportHistory()) return
   const originalOnpopstate = globalThis.onpopstate
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   globalThis.onpopstate = function (ctx: any, ...args: any) {
     const to = document.location.href
     const from = lastHref
     lastHref = to
     //! handleHistory(data: IRouteHistory)
-    publishTraceHandlers(TraceType.History, { from, to } as IRouteHistory)
+    publishTraceHandlers(TraceType.History, { from, to })
     originalOnpopstate?.apply(ctx, args)
   }
 

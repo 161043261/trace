@@ -1,5 +1,16 @@
 import { SDK_VERSION, TraceType } from '@trace-dev/constants'
-import { IDataReporter, IReportData, IScreenRecordData, ITraceOptions } from '@trace-dev/types'
+import {
+  IBaseData,
+  IDataReporter,
+  IHttpData,
+  ILongTaskData,
+  IPerformanceData,
+  IReportData,
+  IResourceError,
+  IScreenRecordData,
+  ISourceCodeError,
+  ITraceOptions
+} from '@trace-dev/types'
 import { generateUUID, isBrowserEnv, traceDev, VoidFnQueue } from '@trace-dev/utils'
 import { breadcrumb } from './main'
 
@@ -7,9 +18,9 @@ export class DataReporter implements IDataReporter {
   queue = new VoidFnQueue() // 回调函数队列
   reportId: string
   dsn = '' // 必填
-  projectId?: string
-  userId?: string
-  useImageReport?: boolean
+  projectId = 'unknown'
+  userId = 'unknown'
+  useImageReport = false
   beforeReportData?: (data: IReportData) => Promise<IReportData>
 
   static #dataReporter: DataReporter
@@ -22,7 +33,6 @@ export class DataReporter implements IDataReporter {
   }
 
   setOptions(options: ITraceOptions) {
-    console.log(options)
     const { dsn, projectId, userId, useImageReport, beforeReportData } = options
     this.dsn = dsn
     this.projectId = projectId
@@ -61,7 +71,18 @@ export class DataReporter implements IDataReporter {
     this.queue.push(requestFn)
   }
 
-  processReportData(data: IReportData): IReportData {
+  processReportData(
+    data:
+      | IReportData
+      | IBaseData
+      | IHttpData
+      | ILongTaskData
+      | IReportData
+      | IPerformanceData
+      | IResourceError
+      | IScreenRecordData
+      | ISourceCodeError
+  ): IReportData {
     const reportData: IReportData = {
       ...data,
       projectId: this.projectId,
@@ -73,7 +94,7 @@ export class DataReporter implements IDataReporter {
       breadcrumb: []
     }
     const excludeTraceTypes = [TraceType.Performance, TraceType.ScreenRecord, TraceType.WhiteScreen]
-    if (!data.type || !excludeTraceTypes.includes(data.type)) {
+    if (!data.traceType || !excludeTraceTypes.includes(data.traceType)) {
       reportData.breadcrumb = breadcrumb.getHeap()
     }
     return reportData
@@ -83,22 +104,26 @@ export class DataReporter implements IDataReporter {
     return url === this.dsn
   }
 
-  async send(data: IReportData) {
+  async send(
+    data:
+      | IReportData
+      | IBaseData
+      | IHttpData
+      | ILongTaskData
+      | IReportData
+      | IPerformanceData
+      | IResourceError
+      | IScreenRecordData
+      | ISourceCodeError
+  ) {
     const dsn = this.dsn
-    console.log(traceDev.options)
     if (dsn === '') {
       console.error('[trace-dev] DSN is empty')
       return
     }
     const options = traceDev.options as ITraceOptions
-    if (
-      options.traceScreenRecord &&
-      options.screenRecordTraceTypeList &&
-      data.traceType &&
-      options.screenRecordTraceTypeList.includes(data.traceType)
-    ) {
+    if (options.screenRecordTraceTypeList.includes(data.traceType)) {
       traceDev.hasError = true
-      ;(data as IScreenRecordData).screenRecordId = traceDev.screenRecordId
     }
     let reportData = this.processReportData(data)
     if (this.beforeReportData) {

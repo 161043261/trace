@@ -31,12 +31,16 @@ app.use(bodyParser.json({ limit: '100mb' }))
 app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }))
 
 const router = express.Router()
-
 router.post('/', async (req, res) => {
-  const body = await coBody.json(req)
-  console.log(body)
-  fs.appendFileSync('trace.log', JSON.stringify(body))
-  res.end()
+  try {
+    const body = await coBody.json(req)
+    console.log(body)
+    fs.appendFileSync('trace.log', JSON.stringify(body))
+  } catch (err) {
+    console.error(err)
+  } finally {
+    res.end()
+  }
 })
 
 app.use('/trace', cors, router)

@@ -11,9 +11,9 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
+    // "noImplicitAny": true,
+    // "noImplicitReturns": true,
+    // "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "paths": {
@@ -23,10 +23,10 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "strictFunctionTypes": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": true,
+    // "strictFunctionTypes": true,
+    // "strictNullChecks": true,
+    // "strictPropertyInitialization": true,
     "target": "ESNext"
   },
-  "include": ["global.d.ts", "packages"]
+  "include": ["global.d.ts", "packages", "packages/server"]
 }

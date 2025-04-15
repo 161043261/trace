@@ -1,5 +1,5 @@
 import { OkOrError, TraceType } from '@trace-dev/constants'
-import { AnyFn, IHttpData, IRouteHistory, ISourceCodeError } from '@trace-dev/types'
+import { AnyFn, IHttpData, IResourceError, ISourceCodeError } from '@trace-dev/types'
 
 import {
   getErrorId,
@@ -35,24 +35,24 @@ export const traceHandler = {
     }
 
     if (data.okOrError === OkOrError.Error) {
-      dataReporter.send({ ...data, type: data.traceType, okOrError: OkOrError.Error })
+      dataReporter.send({ ...data, traceType: data.traceType, okOrError: OkOrError.Error })
     }
   },
 
-  handleError(ev: ErrorEvent & { target?: { localName?: string } }) {
+  handleError(ev: ErrorEvent & { target?: IResourceError }) {
     const target = ev.target
     if (!target || (ev.target && !ev.target.localName)) {
       // 是 Vue 错误, React 错误或异步错误
       const stackFrame = ErrorStackParser.parse(ev.error)[0]
       const { fileName, columnNumber, lineNumber } = stackFrame
       const errorData: ISourceCodeError = {
-        column: columnNumber,
-        line: lineNumber,
+        column: columnNumber ?? -1,
+        line: lineNumber ?? -1,
         traceType: TraceType.Error,
         okOrError: OkOrError.Error,
         timestamp: getTimestamp(),
         message: ev.message,
-        filename: fileName
+        filename: fileName ?? 'unknown'
       }
       breadcrumb.push({
         traceType: TraceType.Error,
@@ -72,6 +72,7 @@ export const traceHandler = {
       }
       return
     }
+
     // 是资源加载错误
     if (/** target &&  */ target?.localName) {
       const resourceData = transformResourceData(target)
@@ -84,13 +85,13 @@ export const traceHandler = {
       })
       dataReporter.send({
         ...resourceData,
-        type: TraceType.Resource,
+        traceType: TraceType.Resource,
         okOrError: OkOrError.Error
       })
     }
   },
 
-  handleHistory(data: IRouteHistory) {
+  handleHistory(data: { from: string; to: string }) {
     const { from, to } = data
     const { relativePath: parsedFrom } = parseUrl2obj(from)
     const { relativePath: parsedTo } = parseUrl2obj(to)
@@ -129,9 +130,9 @@ export const traceHandler = {
       okOrError: OkOrError.Error,
       timestamp: getTimestamp(),
       message,
-      filename: fileName,
-      line: lineNumber,
-      column: columnNumber
+      filename: fileName ?? 'unknown',
+      line: lineNumber ?? -1,
+      column: columnNumber ?? -1
     }
     breadcrumb.push({
       timestamp: getTimestamp(),
@@ -183,8 +184,18 @@ export function batchAddTraceHandlers() {
     traceHashChange,
     traceHistory,
     traceWhiteScreen,
-    traceUnhandledRejection
+    traceUnhandledRejection,
+    tracePerformance,
+    traceScreenRecord
   } = traceDev.options
+
+  console.log(
+    `[core] traceXhr: ${traceXhr}, traceClick: ${traceClick}, traceError: ${traceError}, traceFetch: ${traceFetch}, traceHashChange: ${traceHashChange}, traceHistory: ${traceHistory}, traceWhiteScreen: ${traceWhiteScreen}, traceUnhandledRejection: ${traceUnhandledRejection}`
+  )
+  console.log(
+    `[plugin] tracePerformance: ${tracePerformance}, traceScreenRecord: ${traceScreenRecord}`
+  )
+
   if (traceWhiteScreen ?? true) {
     addTraceHandler(TraceType.WhiteScreen, traceHandler.handleWhiteScreen)
   }

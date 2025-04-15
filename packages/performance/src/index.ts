@@ -2,7 +2,6 @@
 // pnpm add @trace-dev/types --filter @trace-dev/performance
 // pnpm add @trace-dev/constants --filter @trace-dev/performance
 // pnpm install web-vitals --filter @trace-dev/performance
-
 import { TraceType, OkOrError } from '@trace-dev/constants'
 import { ILongTaskData, IMemoryData, IPerformanceData, TracePlugin } from '@trace-dev/types'
 import { getResourceList, getWebVitals } from './main'
