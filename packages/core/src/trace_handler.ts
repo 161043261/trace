@@ -62,7 +62,7 @@ export const traceHandler = {
         timestamp: getTimestamp(),
         okOrError: OkOrError.Error
       })
-      const errorStr = `${TraceType.Error}-${ev.message ?? 'unknownErrorMessage'}-${fileName ?? 'unknownFilename'}-${lineNumber ?? 'unknownLineNumber'}-${columnNumber ?? 'unknownColumnNumber'}`
+      const errorStr = `${TraceType.Error}-${ev.message ?? 'unknown'}-${fileName ?? 'unknown'}-${lineNumber ?? 'unknown'}-${columnNumber ?? 'unknown'}`
       const errorId = getErrorId(errorStr)
       if (
         errorStr.includes('unknown') ||
@@ -142,7 +142,7 @@ export const traceHandler = {
       okOrError: OkOrError.Error,
       data
     })
-    const errorStr = `${TraceType.Error}-${message}-${fileName ?? 'unknownFilename'}-${lineNumber ?? 'unknownLineNumber'}-${columnNumber ?? 'unknownColumnNumber'}`
+    const errorStr = `${TraceType.Error}-${message}-${fileName ?? 'unknown'}-${lineNumber ?? 'unknown'}-${columnNumber ?? 'unknown'}`
     const errorId = getErrorId(errorStr)
     if (
       errorStr.includes('unknown') ||

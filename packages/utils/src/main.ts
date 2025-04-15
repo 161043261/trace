@@ -139,7 +139,7 @@ export const throttle = (fn: AnyFn, delay: number, ctx?: unknown) => {
 
 export function unknown2str(target: unknown): string {
   if (target === undefined) {
-    return 'undefined'
+    return 'unknown'
   }
   // JSON.stringify(undefined) === undefined
   // JSON.stringify(null) === 'null'
