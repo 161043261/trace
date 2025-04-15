@@ -23,6 +23,7 @@ export function getTimestamp(): number {
   return Date.now()
 }
 
+//! todo getYmd
 export function getYmd(): string {
   const pad0 = (num: number) => num.toString().padStart(2, '0')
   const day = new Date()
@@ -134,15 +135,6 @@ export const throttle = (fn: AnyFn, delay: number, ctx?: unknown) => {
       canRun = true
     }, delay)
   } as typeof fn
-}
-
-// > 1.toString();
-// Uncaught SyntaxError: Invalid or unexpected token
-// > Object.prototype.toString.call(1)
-// '[object Number]'
-export function typeofUnknown(target: unknown): string {
-  // Object.prototype.toString.call(1) === '[object Number]'
-  return Object.prototype.toString.call(target).slice(8, -1).toLowerCase()
 }
 
 export function unknown2str(target: unknown): string {

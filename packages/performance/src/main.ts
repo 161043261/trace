@@ -96,7 +96,7 @@ export function notChrome(): boolean {
   return !/Chrome/.test(navigator.userAgent)
 }
 
-export function getEntryList(): PerformanceResourceTiming[] {
+export function getResourceList(): PerformanceResourceTiming[] {
   let entryList: (PerformanceResourceTiming & { fromCache?: boolean })[] =
     performance.getEntriesByType('resource')
   entryList = entryList.filter(

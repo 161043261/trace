@@ -17,12 +17,12 @@ export interface ITraceOptions {
   tracePerformance?: boolean // 是否计算页面性能指标
   traceScreenRecord?: boolean // 是否开启屏幕录制
   traceWhiteScreen?: boolean // 是否开启白屏检测
-  // todo
   useImageReport?: boolean // 是否上报图片错误
   screenRecordDuration?: number // 单次屏幕录制时长
   screenRecordTraceTypeList?: TraceType[]
+  // todo: hasSkeleton
   hasSkeleton?: boolean // 白屏时是否有骨架屏
-  // todo
+  // todo: whiteScreenElements
   whiteScreenElements?: string[] // 白屏检测的元素列表
   ignoredUrlRegExp?: RegExp // 接口正则
   clickThrottleDelay?: number // click 点击事件的节流时长
@@ -32,10 +32,4 @@ export interface ITraceOptions {
   beforeReportData?: (data: IReportData) => Promise<IReportData> // 数据上报前的 hook
   httpErrorHandler?: (data: unknown) => boolean // 处理 http 错误的回调函数
   repeatSourceCodeError?: boolean // 是否重复上报源代码错误
-}
-
-// 屏幕录制配置
-export interface IScreenRecordOptions {
-  traceTypeList: TraceType[]
-  duration: number
 }

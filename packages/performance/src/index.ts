@@ -5,7 +5,7 @@
 
 import { TraceType, OkOrError } from '@trace-dev/constants'
 import { ILongTaskData, IMemoryData, IPerformanceData, TracePlugin } from '@trace-dev/types'
-import { getEntryList, getWebVitals } from './main'
+import { getResourceList, getWebVitals } from './main'
 import { getTimestamp, traceDev } from '@trace-dev/utils'
 
 export default class PerformancePlugin extends TracePlugin {
@@ -37,15 +37,16 @@ export default class PerformancePlugin extends TracePlugin {
         } as ILongTaskData)
       }
     })
+
     observer.observe({ entryTypes: ['longtask'] })
     globalThis.addEventListener('load', function () {
       traceDev.dataReporter.send({
-        name: 'entryList',
+        name: 'resourceList',
         okOrError: OkOrError.Ok,
         timestamp: getTimestamp(),
         traceType: TraceType.Performance,
-        entryList: getEntryList()
-      })
+        resourceList: getResourceList()
+      } as IPerformanceData)
     })
 
     if (performance.memory) {

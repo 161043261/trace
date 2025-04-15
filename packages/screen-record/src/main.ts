@@ -1,6 +1,6 @@
 import { record } from 'rrweb'
 import pako from 'pako'
-import { IDataReporter } from '@trace-dev/types'
+import { IDataReporter, IScreenRecordData } from '@trace-dev/types'
 import { generateUUID, getTimestamp, MinHeap, traceDev } from '@trace-dev/utils'
 import { TraceType, OkOrError } from '@trace-dev/constants'
 
@@ -20,7 +20,7 @@ export function screenRecorder(dataReporter: IDataReporter, screenRecordDuration
             traceType: TraceType.ScreenRecord,
             screenRecordId: screenRecordId,
             recordEvents: compress(recordEventHeap.getAndClearHeap())
-          })
+          } as IScreenRecordData)
           traceDev.hasError = false
         } else {
           traceDev.screenRecordId = generateUUID()

@@ -3,7 +3,7 @@
 // pnpm add @trace-dev/types --filter @trace-dev/screen-record
 // pnpm install pako rrweb --filter @trace-dev/screen-record
 // pnpm install @types/pako -D --filter @trace-dev/screen-record
-import { IScreenRecordOptions, TracePlugin } from '@trace-dev/types'
+import { TracePlugin } from '@trace-dev/types'
 import { screenRecorder } from './main'
 import { TraceType } from '@trace-dev/constants'
 import { generateUUID, traceDev } from '@trace-dev/utils'
@@ -17,7 +17,7 @@ export default class ScreenRecordPlugin extends TracePlugin {
     TraceType.Fetch,
     TraceType.Xhr
   ]
-  constructor(options?: IScreenRecordOptions) {
+  constructor(options?: { traceTypeList: TraceType[]; duration: number }) {
     super(TraceType.ScreenRecord /** traceType */)
     this.type = TraceType.ScreenRecord
     if (options) {

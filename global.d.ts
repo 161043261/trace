@@ -14,3 +14,11 @@ interface Window {
     deviceInfo: unknown
   }
 }
+
+declare interface Performance {
+  memory?: {
+    jsHeapSizeLimit: number
+    totalJSHeapSize: number
+    usedJSHeapSize: number
+  }
+}

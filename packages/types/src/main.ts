@@ -27,16 +27,6 @@ export interface IDataReporter {
   send(data: IReportData): Promise<void>
 }
 
-//! [暂未使用]
-export interface IUserEventData {
-  traceType: TraceType // 事件类型
-  behaviorType: BreadcrumbType // 用户行为类型
-  statusCode: OkOrError
-  data: unknown
-  message: string
-  name?: string
-}
-
 export interface IDeviceInfo {
   browserVersion: string | number // 浏览器的版本号
   browserName: string // 例如 chrome
@@ -95,6 +85,7 @@ export interface IReportData extends IBaseData {
   breadcrumb?: IBreadcrumbItem[]
   // 设备信息
   deviceInfo?: IDeviceInfo
+  data?: unknown
 }
 
 // TraceType.Performance 性能指标
@@ -105,7 +96,7 @@ export interface IPerformanceData extends IBaseData {
   // traceType?: TraceType
   score?: number // 分数
   poorOrGood?: 'poor' | 'good'
-  entryList?: PerformanceResourceTiming[]
+  resourceList?: PerformanceResourceTiming[]
 }
 
 // 资源加载错误
@@ -125,7 +116,7 @@ export interface IRouteHistory {
   to: string
 }
 
-// todo 屏幕录制信息
+// 屏幕录制信息
 export interface IScreenRecordData extends IBaseData {
   // name?: string
   // okOrError?: OkOrError
@@ -147,11 +138,6 @@ export interface ISourceCodeError extends IBaseData {
   filename?: string // 报错的文件名
 }
 
-export interface ISubscribeHandler {
-  type: TraceType
-  callback: AnyFn
-}
-
 // 参考 trace.d.ts
 export interface ITraceDev {
   hasError: boolean // 某个时间段, 代码是否报错
@@ -170,9 +156,4 @@ export abstract class TracePlugin {
     this.type = type
   }
   abstract init(): void
-}
-
-export interface ITraceTypeAndHandler {
-  traceType: TraceType
-  handler: AnyFn
 }

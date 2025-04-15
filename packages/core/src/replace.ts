@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { RequestMethod, RequestType, TraceType } from '@trace-dev/constants'
 import { IHttpData, IRouteHistory, VoidFn } from '@trace-dev/types'
-import { getTimestamp, replaceAop, throttle, traceDev } from '@trace-dev/utils'
+import { getTimestamp, replaceAop, supportHistory, throttle, traceDev } from '@trace-dev/utils'
 import { publishTraceHandlers, dataReporter } from './main'
 
 function isIgnoredUrl(url: string) {
@@ -168,6 +168,7 @@ function listenAndPublishClick() {
 let lastHref = document.location.href
 
 function replaceAndPublishHistory() {
+  if (!supportHistory()) return
   const originalOnpopstate = globalThis.onpopstate
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   globalThis.onpopstate = function (ctx: any, ...args: any) {
