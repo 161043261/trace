@@ -8,6 +8,14 @@ export type VoidFn = (...args: any[]) => void
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyObject = Record<number | string | symbol, any>
 
+export interface IAnyError extends Error {
+  target?: {
+    localName?: string
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  error?: any
+}
+
 export interface IBaseData {
   name?: string
   okOrError: OkOrError
@@ -93,10 +101,9 @@ export interface IPerformanceData extends IBaseData {
 
 // 资源加载错误
 export interface IResourceError extends IBaseData {
-  localName: string
   src: string
   href: string
-  message: string // 资源加载失败的信息
+  localName: string
 }
 
 // 屏幕录制信息

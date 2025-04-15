@@ -45,9 +45,9 @@ export class OptionsHelper {
     return this.#optionsHelper
   }
 
-  setOptions(options: ITraceOptions) {
+  setOptions(options: Partial<ITraceOptions> & { dsn: string }) {
     this.dsn = options.dsn
     traceDev.options = { ...this.defaultOptions, ...options }
-    dataReporter.setOptions(options)
+    dataReporter.setOptions(traceDev.options)
   }
 }

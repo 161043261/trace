@@ -1,4 +1,4 @@
-import { OkOrError, StatusCode } from '@trace-dev/constants'
+import { OkOrError, StatusCode, TraceType } from '@trace-dev/constants'
 import { IHttpData, IResourceError } from '@trace-dev/types'
 import { traceDev, statusCode2phrase, getTimestamp } from '@trace-dev/utils'
 
@@ -34,11 +34,14 @@ export function transformHttpData(data: IHttpData): IHttpData {
   }
 }
 
-export function transformResourceData(data: IResourceError): IResourceError {
+export function transformResourceError(data: Partial<IResourceError>): IResourceError {
   return {
-    ...data,
     name: data.localName,
-    message: `resourceError: { src: ${data.src}, href: ${data.href} }`,
-    timestamp: getTimestamp()
+    okOrError: data.okOrError ?? OkOrError.Error,
+    timestamp: getTimestamp(),
+    traceType: TraceType.Resource,
+    src: data.src ?? 'unknown',
+    href: data.href ?? 'unknown',
+    localName: data.localName ?? 'unknown'
   }
 }

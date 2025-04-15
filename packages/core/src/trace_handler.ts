@@ -1,5 +1,5 @@
 import { OkOrError, TraceType } from '@trace-dev/constants'
-import { AnyFn, IHttpData, IResourceError, ISourceCodeError } from '@trace-dev/types'
+import { AnyFn, IHttpData, IAnyError, ISourceCodeError } from '@trace-dev/types'
 
 import {
   getErrorId,
@@ -17,7 +17,7 @@ import {
   replaceAndPublish,
   subscribeTraceHandler,
   transformHttpData,
-  transformResourceData
+  transformResourceError
 } from './main'
 import ErrorStackParser from 'error-stack-parser'
 import { checkWhiteScreen } from './white_screen'
@@ -40,11 +40,11 @@ export const traceHandler = {
     }
   },
 
-  handleError(ev: ErrorEvent & { target?: IResourceError }) {
+  handleError(ev: IAnyError) {
     const target = ev.target
     if (!target || (ev.target && !ev.target.localName)) {
-      // 是 Vue 错误, React 错误或异步错误
-      const stackFrame = ErrorStackParser.parse(ev.error)[0]
+      // 是 Vue 捕获的错误, React 捕获的错误, 或异步错误
+      const stackFrame = ErrorStackParser.parse(!target ? ev : ev.error)[0]
       const { fileName, columnNumber, lineNumber } = stackFrame
       const errorData: ISourceCodeError = {
         column: columnNumber ?? -1,
@@ -52,7 +52,7 @@ export const traceHandler = {
         traceType: TraceType.Error,
         okOrError: OkOrError.Error,
         timestamp: getTimestamp(),
-        message: ev.message,
+        message: ev.message ?? 'unknown',
         filename: fileName ?? 'unknown'
       }
       breadcrumb.push({
@@ -76,16 +76,16 @@ export const traceHandler = {
 
     // 是资源加载错误
     if (/** target &&  */ target?.localName) {
-      const resourceData = transformResourceData(target)
+      const resourceError = transformResourceError(target)
       breadcrumb.push({
         traceType: TraceType.Resource,
         breadcrumbType: breadcrumb.traceType2breadcrumbType(TraceType.Resource),
         okOrError: OkOrError.Error,
         timestamp: getTimestamp(),
-        data: resourceData
+        data: resourceError
       })
       dataReporter.send({
-        ...resourceData,
+        ...resourceError,
         traceType: TraceType.Resource,
         okOrError: OkOrError.Error
       })

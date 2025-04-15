@@ -6,17 +6,17 @@ import PerformancePlugin from '@trace-dev/performance'
 import ScreenRecordPlugin from '@trace-dev/screen-record'
 import { ITraceOptions } from '@trace-dev/types'
 import { nativeTryCatch } from '@trace-dev/utils'
-import { batchAddTraceHandlers, OptionsHelper } from './main'
+import { batchAddTraceHandlers, OptionsHelper, traceHandler } from './main'
 import { SDK_NAME, SDK_VERSION } from '@trace-dev/constants'
 
-function init(options: ITraceOptions) {
+function init(options: Partial<ITraceOptions> & { dsn: string }) {
   const optionsHelper = OptionsHelper.optionsHelper
   optionsHelper.setOptions(options)
   batchAddTraceHandlers()
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function vuePluginFn(app: any, options: ITraceOptions) {
+export function vuePluginFn(app: any, options: Partial<ITraceOptions> & { dsn: string }) {
   app.config.errorHandler = (err: unknown, instance: unknown, info: string) => {
     // 错误上报
     // err 错误对象
@@ -34,12 +34,14 @@ export function use(Plugin: typeof PerformancePlugin | typeof ScreenRecordPlugin
   }, console.error)
 }
 
-const vuePlugin = {
+export function errorBoundary(err: Error) {
+  traceHandler.handleError(err)
+}
+
+export default {
   SDK_VERSION,
   SDK_NAME,
   init,
   install: vuePluginFn,
   use
 }
-
-export default vuePlugin
