@@ -1,0 +1,30 @@
+{
+  "name": "@trace-dev/core",
+  "version": "1.0.0",
+  "description": "trace-dev core",
+  "main": "src/index.ts",
+  "publishConfig": {
+    "main": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "trace-dev",
+    "core"
+  ],
+  "author": "161043261.github.io",
+  "license": "ISC",
+  "packageManager": "pnpm@10.7.1",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:161043261/trace.git"
+  },
+  "dependencies": {
+    "@trace-dev/constants": "workspace:^",
+    "@trace-dev/types": "workspace:^",
+    "@trace-dev/utils": "workspace:^",
+    "error-stack-parser": "^2.1.4"
+  }
+}

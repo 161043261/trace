@@ -1,0 +1,34 @@
+{
+  "name": "@trace-dev/screen-record",
+  "version": "1.0.0",
+  "description": "trace-dev screen-record",
+  "main": "src/index.ts",
+  "publishConfig": {
+    "main": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "trace-dev",
+    "screen-record"
+  ],
+  "author": "161043261.github.io",
+  "license": "ISC",
+  "packageManager": "pnpm@10.7.1",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:161043261/trace.git"
+  },
+  "dependencies": {
+    "@trace-dev/constants": "workspace:^",
+    "@trace-dev/types": "workspace:^",
+    "@trace-dev/utils": "workspace:^",
+    "pako": "^2.1.0",
+    "rrweb": "2.0.0-alpha.4"
+  },
+  "devDependencies": {
+    "@types/pako": "^2.0.3"
+  }
+}

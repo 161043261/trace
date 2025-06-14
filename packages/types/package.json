@@ -1,0 +1,24 @@
+{
+  "name": "@trace-dev/types",
+  "version": "1.0.0",
+  "description": "trace-dev types",
+  "main": "src/index.ts",
+  "publishConfig": {
+    "main": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "trace-dev",
+    "types"
+  ],
+  "author": "161043261.github.io",
+  "license": "ISC",
+  "packageManager": "pnpm@10.7.1",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:161043261/trace.git"
+  }
+}
